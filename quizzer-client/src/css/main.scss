@@ -1,0 +1,63 @@
+$charcoal: #2C3141;
+$titanium: #EDE6E3;
+$tomato: #F06449;
+$correct: #95B46A;
+$incorrect: #E63946;
+
+* {
+  margin: 0;
+  padding: 0;
+  color: $titanium;
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+}
+
+body {
+  background: $charcoal;
+  padding: 1em;
+}
+
+h1.logo-text {
+  color: $tomato;
+  position: relative;
+  top: -12px;
+}
+
+.landing-form {
+  position: relative;
+  top: 50px;
+  display: flex;
+  flex-direction: column;
+
+  &>* {
+    margin-bottom: 20px;
+  }
+
+  label {
+    font-size: 23px;
+    font-weight: bold;
+    font-style: italic;
+  }
+
+  button.submit {
+    background: none;
+    border: none;
+    text-align: right;
+    cursor: pointer;
+  }
+
+  input[type=text],
+  input[type=password] {
+    background: none;
+    border: none;
+    border-bottom: 3px solid $titanium;
+    padding: .25em;
+    font-style: italic;
+    font-size: 20px;
+  }
+}
