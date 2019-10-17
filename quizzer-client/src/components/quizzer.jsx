@@ -1,16 +1,15 @@
 import React from 'react'
-import Landing from './landing'
-import LandingForm from './landingform'
+import TeamApp from '../containers/teamapp'
+import AdminApp from '../containers/adminapp'
+import { BrowserRouter, Route, Switch } from 'react-router-dom'
 
 export default function Quizzer() {
-  return <Landing>
-    <h1 className="logo-text">Quizzer</h1>
-    <LandingForm
-      type="text"
-      label="Enter your room number"
-      input_name="room"
-      input_placeholder="123456"
-      input_maxLength="6"
-    />
-  </Landing>
+  return <BrowserRouter>
+    <Switch>
+      <Route exact path="/admin/:roomid" component={AdminApp} />
+      <Route exact path="/admin" component={AdminApp} />
+      <Route exact path="/:roomid" component={TeamApp} />
+      <Route exact path="/" component={TeamApp} />
+    </Switch>
+  </BrowserRouter>
 }
