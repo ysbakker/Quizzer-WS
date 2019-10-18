@@ -1,15 +1,21 @@
 import React from 'react'
 
 export default function LandingForm(props) {
+  const { fieldType, fieldName, fieldPlaceholder, fieldMaxLength, label } = props.formData
   return <form className="landing-form">
-    <label htmlFor={props.input_name}>{props.label}</label>
+    <label htmlFor={fieldName}>{label}</label>
     <input
-      type={props.type}
-      id={props.input_name}
-      placeholder={props.input_placeholder}
-      maxLength={props.input_maxLength}
+      type={fieldType}
+      id={fieldName}
+      placeholder={fieldPlaceholder}
+      maxLength={fieldMaxLength}
     />
-    <button className="submit">
+    <button className="submit" onClick={(event) => {
+      const el = document.querySelector(`#${fieldName}`)
+      event.preventDefault()
+      props.handleSubmit(props.next, el.value)
+      el.value = ''
+    }}>
       <img src="img/submit_arrow.svg" alt="Submit" />
     </button>
   </form >

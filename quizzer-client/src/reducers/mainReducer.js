@@ -2,9 +2,8 @@ import {
   combineReducers
 } from 'redux'
 
-import updateStatusReducer from './updateStatus'
+import updateStatusReducer from './updateAppState'
 
 export const mainReducer = combineReducers({
-  TeamApp: updateStatusReducer,
-  AdminApp: updateStatusReducer
+  appState: updateStatusReducer,
 })
