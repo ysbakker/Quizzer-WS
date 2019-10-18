@@ -22,6 +22,37 @@ body {
   padding: 1em;
 }
 
+.alert-bar {
+  z-index: 10;
+  position: absolute;
+  top: -3em;
+  left: 0;
+  right: 0;
+  width: 100%;
+  text-align: center;
+  padding: .5em;
+  font-weight: bold;
+  box-shadow: 0 2px 5px $charcoal;
+  transition: top .2s;
+
+  p {
+    color: $titanium
+  }
+
+  &.error {
+    background: $incorrect;
+  }
+
+  &.success {
+    background: $correct;
+  }
+
+  &.show {
+    top: 0;
+    transition: top .2s;
+  }
+}
+
 // TeamApp
 
 h1.logo-text {

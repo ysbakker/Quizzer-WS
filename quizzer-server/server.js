@@ -3,20 +3,25 @@ const ws = require('ws');
 const http = require('http');
 
 const app = express();
-const HTTPServer = http.createServer();
-const WSServer = new ws.Server({
-  server: HTTPServer
+const server = http.createServer();
+const wss = new ws.Server({
+  noServer: true
 });
 
-// code to setup event listeners for WebSocket communication can go here
-WSServer.on("connection", socket => {
-  socket.on("close", () => {})
-
-  socket.on("message", (message) => {})
+// HTTP upgrade handler, currently always emits connection
+server.on("upgrade", (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, socket => {
+    wss.emit('connection', socket, request);
+  })
 })
 
-HTTPServer.on('request', app);
-HTTPServer.listen(3000,
-  function () {
-    console.log("The Server is lisening on port 3000.")
-  });
+// Handle new socket connection, this means HTTP upgrade was OK
+wss.on("connection", socket => {
+  console.log("New socket connected!", socket)
+  // TODO: Attach socket event listeners
+})
+
+server.on('request', app);
+server.listen(3000, () => {
+  console.log("The Server is lisening on port 3000.")
+});

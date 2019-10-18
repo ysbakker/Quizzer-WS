@@ -1,11 +1,14 @@
 import React from 'react';
 import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
+import { setError, showAlertBar } from '../components/alertbar'
 
 import updateStatus from '../actions/updateStatus'
 import updateRoomNumber from '../actions/updateRoomNumber'
 
 import { connect } from 'react-redux'
+
+const socket = new WebSocket('ws://localhost:3000')
 
 const appStatusFlow = [
   'enteringRoom',
@@ -46,6 +49,10 @@ const formValues = {
 }
 
 function TeamApp(props) {
+  socket.onerror = err => {
+    setError('Couldn\'t connect to server!')
+    showAlertBar()
+  }
   switch (props.appState.status) {
     case 'enteringRoom':
       return <Landing>
