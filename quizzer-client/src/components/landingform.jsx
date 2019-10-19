@@ -13,7 +13,7 @@ export default function LandingForm(props) {
     <button className="submit" onClick={(event) => {
       const el = document.querySelector(`#${fieldName}`)
       event.preventDefault()
-      props.handleSubmit(props.next, el.value)
+      props.handleSubmit(el.value)
       el.value = ''
     }}>
       <img src="img/submit_arrow.svg" alt="Submit" />

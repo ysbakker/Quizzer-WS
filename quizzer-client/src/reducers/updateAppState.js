@@ -6,7 +6,7 @@ import {
 
 // By default, the user hasn't entered a room number yet.
 const initialState = {
-  status: 'enteringRoom',
+  status: 1,
   currentRoomNumber: null,
   currentRoomName: null
 }

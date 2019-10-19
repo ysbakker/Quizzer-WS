@@ -91,7 +91,9 @@ a.bare-link {
   }
 
   input[type=text],
+  input[type=number],
   input[type=password] {
+    width: 100%;
     border-radius: 0;
     background: none;
     border: none;
