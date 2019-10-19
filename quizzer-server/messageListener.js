@@ -1,7 +1,7 @@
 class Room {
   constructor() {
     this.name
-    this.password = 'test'
+    this.password
     this.teams = []
     this.quizmaster
   }
@@ -49,6 +49,7 @@ const messageListener = (message, socket, server) => {
         // Client isn't quizmaster of any room
         socket.send({
           mType: 'ERROR',
+          code: 'NOT AUTHORIZED',
           message: 'You are not the quizmaster!'
         })
         break
@@ -75,6 +76,7 @@ const messageListener = (message, socket, server) => {
         // Client isn't quizmaster of any room
         socket.send({
           mType: 'ERROR',
+          code: 'NOT AUTHORIZED',
           message: 'You are not the quizmaster!'
         })
         break
@@ -104,6 +106,7 @@ const messageListener = (message, socket, server) => {
         // the room.
         socket.send(JSON.stringify({
           mType: 'ERROR',
+          code: 'INCORRECT ROOM',
           message: 'That room doesn\'t exist!'
         }))
         break
@@ -113,12 +116,15 @@ const messageListener = (message, socket, server) => {
         // Password incorrect
         socket.send(JSON.stringify({
           mType: 'ERROR',
+          code: 'INCORRECT PASS',
           message: 'Password incorrect!'
         }))
         break
       }
 
       room.teams.push(socket)
+      socket.room = id
+
       socket.send(JSON.stringify({
         mType: 'ROOM_NAME',
         payload: room.name
