@@ -21,14 +21,10 @@ export function setSuccess(message) {
 }
 
 export function showAlertBar(duration = 0) {
-  function hideAlertBar() {
-    el.classList.remove('show')
-  }
-
   const el = document.querySelector('.alert-bar')
   el.classList.add('show')
 
-  if (duration != 0) setTimeout(() => {
-    hideAlertBar()
+  if (duration !== 0) setTimeout(() => {
+    el.classList.remove('show')
   }, duration)
 }

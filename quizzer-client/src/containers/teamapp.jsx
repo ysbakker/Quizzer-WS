@@ -13,7 +13,7 @@ const socket = new WebSocket('ws://localhost:3000')
 const appStatusFlow = [
   'enteringRoom',
   'enteringPass',
-  'connecting',
+  'verifyingCredentials',
   'enteringTeam',
   'verifyingTeam'
 ]
@@ -76,8 +76,8 @@ function TeamApp(props) {
         />
       </Landing>
     case 'enteringTeam':
-    case 'connecting':
-      return <Landing loading loadingMessage="Connecting to server..." />
+    case 'verifyingCredentials':
+      return <Landing loading loadingMessage="Verifying credentials..." />
     default:
       return <Landing loading />
   }
