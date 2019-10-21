@@ -5,11 +5,12 @@ import LoadingSpinner from '../components/loadingspinner'
 export default function Landing(props) {
   return <div className="team-landing">
     <Logo />
-    {props.loading ?
-      <LoadingSpinner
-        text={props.loadingMessage !== undefined ? props.loadingMessage : "Waiting..."}
+    {props.loading
+      ? <LoadingSpinner
+        text={props.loadingMessage !== undefined && props.loadingMessage !== null
+          ? props.loadingMessage
+          : "Waiting..."}
       />
-      : ''}
-    {props.children}
+      : props.children}
   </div>
 }

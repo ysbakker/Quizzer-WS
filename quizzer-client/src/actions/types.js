@@ -1,3 +1,5 @@
 export const UPDATE_APP_STATUS = 'update app status'
 export const UPDATE_ROOM_NUMBER = 'update room number'
 export const UPDATE_ROOM_NAME = 'update room name'
+export const UPDATE_AFTER_LOADING_STATUS = 'update status after loading'
+export const UPDATE_LOADING_MESSAGE = 'update loading message'

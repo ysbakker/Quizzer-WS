@@ -10,6 +10,7 @@ export default function Quizzer() {
     <AlertBar message="Something went wrong" />
     <Switch>
       <Route path="/admin" component={AdminApp} />
+      <Route path="/:roomid" component={TeamApp} />
       <Route path="/" component={TeamApp} />
     </Switch>
   </BrowserRouter>
