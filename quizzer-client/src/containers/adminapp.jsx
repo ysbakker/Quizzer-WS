@@ -115,7 +115,7 @@ function AdminApp(props) {
 
   // Determine the status of the app and render accordingly
   switch (appState.status) {
-    case ENTER_NAME:
+    case ENTER_NAME: {
       return <Landing>
         <LandingForm
           formData={formValues[appState.status]}
@@ -129,7 +129,8 @@ function AdminApp(props) {
           }}
         />
       </Landing>
-    case ENTER_PASS:
+    }
+    case ENTER_PASS: {
       return <Landing>
         <LandingForm
           formData={formValues[appState.status]}
@@ -142,8 +143,10 @@ function AdminApp(props) {
           }}
         />
       </Landing>
-    default:
+    }
+    default: {
       return <Landing loading />
+    }
   }
 }
 
