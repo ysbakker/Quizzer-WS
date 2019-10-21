@@ -8,9 +8,9 @@ import { setError, setSuccess, showAlertBar } from '../components/alertbar'
 import updateStatus from '../actions/updateStatus'
 import updateRoomNumber from '../actions/updateRoomNumber'
 
-/**********************
- ** All app statuses **
- **********************/
+/**************************
+ ** All TeamApp statuses **
+ **************************/
 
 const ENTER_ROOM = 1
 const ENTER_PASS = 2

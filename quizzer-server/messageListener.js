@@ -1,5 +1,6 @@
 class Room {
-  constructor() {
+  constructor(id) {
+    this.id = id
     this.name
     this.password
     this.teams = []
@@ -14,7 +15,7 @@ const uniqueRandomRoomId = (rooms) => {
   const generateId = () => Math.floor(100000 + Math.random() * 900000)
 
   let id = generateId()
-  while (rooms[id] !== undefined) {
+  while (rooms.find(room => room.id === id) !== undefined) {
     id = generateId()
   }
   return id
@@ -26,9 +27,9 @@ const messageListener = (message, socket, server) => {
   switch (message.mType) {
     case 'GENERATE_ROOM': {
       // Generates unique room id and makes this client 'quiz master'
-      const id = uniqueRandomRoomId(server.rooms)
-      server.rooms[id] = new Room()
-      server.rooms[id].quizmaster = socket
+      const id = uniqueRandomRoomId(server.rooms).toString()
+      server.rooms.push(new Room(id))
+      server.rooms.find(room => room.id === id).quizmaster = socket
 
       socket.send(JSON.stringify({
         mType: 'ROOM_ID',
@@ -43,24 +44,24 @@ const messageListener = (message, socket, server) => {
       const {
         password
       } = message
-      const room = [...server.rooms].find(room => room.quizmaster === socket)
+      const room = server.rooms.find(room => room.quizmaster === socket)
 
       if (room === undefined) {
         // Client isn't quizmaster of any room
-        socket.send({
+        socket.send(JSON.stringify({
           mType: 'ERROR',
           code: 'NOT AUTHORIZED',
           message: 'You are not the quizmaster!'
-        })
+        }))
         break
       }
 
       room.password = password
 
-      socket.send({
+      socket.send(JSON.stringify({
         mType: 'SUCCESS',
         message: 'Set password succesfully!'
-      })
+      }))
       break
     }
 
@@ -70,24 +71,24 @@ const messageListener = (message, socket, server) => {
       const {
         name
       } = message
-      const room = [...server.rooms].find(room => room.quizmaster === socket)
+      const room = server.rooms.find(room => room.quizmaster === socket)
 
       if (room === undefined) {
         // Client isn't quizmaster of any room
-        socket.send({
+        socket.send(JSON.stringify({
           mType: 'ERROR',
           code: 'NOT AUTHORIZED',
           message: 'You are not the quizmaster!'
-        })
+        }))
         break
       }
 
       room.name = name
 
-      socket.send({
+      socket.send(JSON.stringify({
         mType: 'SUCCESS',
         message: 'Set name succesfully!'
-      })
+      }))
       break
     }
 
@@ -98,7 +99,7 @@ const messageListener = (message, socket, server) => {
         id,
         password
       } = message
-      const room = server.rooms[id]
+      const room = server.rooms.find(room => room.id === id)
 
       if (room === undefined || room.password === undefined) {
         // Room doesn't exist
@@ -123,7 +124,7 @@ const messageListener = (message, socket, server) => {
       }
 
       room.teams.push(socket)
-      socket.room = id
+      socket.roomid = id
 
       socket.send(JSON.stringify({
         mType: 'ROOM_NAME',

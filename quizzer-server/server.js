@@ -8,25 +8,17 @@ const messageListener = require('./messageListener');
 const app = express();
 const server = http.createServer();
 const wss = new ws.Server({
-  server: server
-  // noServer: true
+  noServer: true
 });
 
-wss.rooms = {
-  1: {
-    name: 'test',
-    password: 'test',
-    teams: [],
-    quizmaster: {}
-  }
-};
+wss.rooms = []
 
 // HTTP upgrade handler, currently always emits connection
-// server.on("upgrade", (request, socket, head) => {
-//   wss.handleUpgrade(request, socket, head, socket => {
-//     wss.emit('connection', socket, request);
-//   })
-// })
+server.on("upgrade", (request, socket, head) => {
+  wss.handleUpgrade(request, socket, head, socket => {
+    wss.emit('connection', socket, request);
+  })
+})
 
 // Handle new socket connection, this means HTTP upgrade was OK
 wss.on("connection", socket => {
@@ -42,9 +34,10 @@ const attachListeners = (socket, server) => {
   socket.on('message', message => messageListener(message, socket, server))
 
   socket.on('close', () => {
-    if (socket.room !== undefined) {
+    if (socket.roomid !== undefined) {
       // Remove socket from its room's 'team' array
-      server.rooms[socket.room].teams = server.rooms[socket.room].teams.filter(team => {
+      const room = server.rooms.find(room => room.id === socket.roomid);
+      room.teams = room.teams.filter(team => {
         return team !== socket
       })
     }
