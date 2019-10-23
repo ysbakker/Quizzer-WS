@@ -9,7 +9,11 @@
   "author": "Yorrick Bakker",
   "license": "MIT",
   "dependencies": {
+    "connect-mongo": "^3.0.0",
+    "cors": "^2.8.5",
     "express": "^4.17.1",
+    "express-session": "^1.17.0",
+    "mongoose": "^5.7.6",
     "ws": "^7.1.2"
   }
 }

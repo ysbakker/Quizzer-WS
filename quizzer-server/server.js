@@ -1,22 +1,49 @@
-const express = require('express');
-const ws = require('ws');
-const http = require('http');
+const express = require('express')
+const ws = require('ws')
+const http = require('http')
+const mongoose = require('mongoose')
+const cors = require('cors');
+const bodyParser = require('body-parser')
+const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 
 // Import event listeners
 const messageListener = require('./messageListener');
 
 const app = express();
 const server = http.createServer();
+
+const sessionParser = session({
+  secret: '9jDb8AHQdY',
+  resave: true,
+  saveUninitialized: false,
+  store: new MongoStore({
+    mongooseConnection: mongoose.connection
+  })
+})
+
+/************************
+ * Socket Server Config *
+ ************************/
+
 const wss = new ws.Server({
   noServer: true
 });
 
-wss.rooms = []
-
-// HTTP upgrade handler, currently always emits connection
 server.on("upgrade", (request, socket, head) => {
-  wss.handleUpgrade(request, socket, head, socket => {
-    wss.emit('connection', socket, request);
+  sessionParser(request, {}, () => {
+    const {
+      session
+    } = request
+
+    if (session.auth === 1) {
+      wss.handleUpgrade(request, socket, head, socket => {
+        wss.emit('connection', socket, request);
+      })
+      return
+    }
+
+    socket.destroy()
   })
 })
 
@@ -43,3 +70,32 @@ const attachListeners = (socket, server) => {
     }
   })
 }
+
+/*******************
+ * REST API Config *
+ *******************/
+// POST /quizzer/rooms -> create new room
+// POST /quizzer/rooms/:roomid/teams -> create new team (auth)
+// PATCH /quizzer/rooms/:roomid/teams/:teamid -> update team name
+// POST /quizzer/rooms/:roomid/rounds -> create a new round
+// PUT /quizzer/rooms/:roomid/rounds/:round/categories -> edit categories for round
+// 
+
+mongoose.connect('mongodb://localhost/Quizzer', {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
+});
+
+app.use(cors({
+  origin: true,
+  credentials: true
+}));
+app.options("*", cors({
+  origin: true,
+  credentials: true
+}));
+app.use(bodyParser.json())
+app.use(sessionParser);
+
+// app.use('/', require('./routes/teams'))
+app.use('/', require('./routes/quizmaster'))
