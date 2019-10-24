@@ -1,6 +1,6 @@
 import {
   UPDATE_APP_STATUS,
-  UPDATE_AFTER_LOADING_STATUS,
+  UPDATE_ON_SUCCESS_STATUS,
   UPDATE_LOADING_MESSAGE,
   UPDATE_ROOM_NUMBER,
   UPDATE_ROOM_NAME
@@ -9,7 +9,7 @@ import {
 // Default state
 const initialState = {
   status: 'enteringRoom',
-  statusAfterLoading: 'enteringTeam',
+  statusOnSuccess: 'enteringTeam',
   loadingMessage: null,
   currentRoomNumber: null,
   currentRoomName: null
@@ -26,9 +26,9 @@ export default function updateAppStateReducer(state = initialState, action) {
         ...changes
       }
     }
-    case UPDATE_AFTER_LOADING_STATUS: {
+    case UPDATE_ON_SUCCESS_STATUS: {
       const changes = {
-        statusAfterLoading: action.payload
+        statusOnSuccess: action.payload
       }
       return {
         ...state,

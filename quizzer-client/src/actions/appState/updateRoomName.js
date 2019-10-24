@@ -1,6 +1,6 @@
 import {
   UPDATE_ROOM_NAME
-} from './types'
+} from '../types'
 
 export default function updateRoomNameAction(name) {
   return {

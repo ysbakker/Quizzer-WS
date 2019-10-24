@@ -1,24 +1,14 @@
 import React from 'react';
 import { connect } from 'react-redux'
+import { Switch, Route } from 'react-router'
 
 import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
-import { setError, setSuccess, showAlertBar } from '../components/alertbar'
 
-import updateStatus from '../actions/updateStatus'
-import updateRoomName from '../actions/updateRoomName'
-
-/***************************
- ** All AdminApp statuses **
- ***************************/
-
-const ENTER_NAME = 1
-const ENTER_PASS = 2
-
-const appStatusFlow = [
-  ENTER_NAME,
-  ENTER_PASS
-]
+import updateStatus from '../actions/appState/updateStatus'
+import updateRoomName from '../actions/appState/updateRoomName'
+import updateOnSuccessStatus from '../actions/appState/updateOnSuccessStatus'
+import updateLoadingMessage from '../actions/appState/updateLoadingMessage'
 
 /********************
  ** WebSocket conf **
@@ -32,73 +22,24 @@ const sendStringToSocket = string => {
 
 const attachSocketListeners = props => {
   socket.onopen = () => {
-    sendStringToSocket(JSON.stringify({
-      mType: 'GENERATE_ROOM'
-    }))
   }
 
   socket.onerror = event => {
-    setError('Couldn\'t connect to server')
-    showAlertBar()
-    props.updateStatus(ENTER_NAME)
+    props.updateStatus('enteringName')
   }
 
   socket.onclose = event => {
-    setError('Connection closed by server')
-    showAlertBar(5000)
-    props.updateStatus(ENTER_NAME)
+    props.updateStatus('enteringName')
   }
 
   socket.onmessage = event => {
     const msg = JSON.parse(event.data)
 
     switch (msg.mType) {
-      case 'SUCCESS':
-        setSuccess(msg.message)
-        showAlertBar(5000)
-        props.updateStatus(getNextStatusInFlow(props.appState.status))
-        break
-      case 'ERROR':
-        setError(msg.message)
-        showAlertBar(5000)
-        stateChangeOnError(msg.code, props.updateStatus)
-        break
       default:
         console.log('Message with unknown mType received:', msg)
         break
     }
-  }
-}
-
-const stateChangeOnError = (code, statusUpdater) => {
-  switch (code) {
-    case 'INCORRECT PASS':
-      statusUpdater(ENTER_PASS)
-      break
-  }
-}
-
-const getNextStatusInFlow = (currentStatus) => {
-  const i = appStatusFlow.indexOf(currentStatus)
-  if (i === appStatusFlow.length - 1) return currentStatus
-  else return appStatusFlow[i + 1]
-}
-
-// Form values dependent on current app status
-const formValues = {
-  [ENTER_NAME]: {
-    fieldType: 'text',
-    fieldName: 'name',
-    fieldPlaceholder: 'The Liberty Well',
-    fieldMaxLength: 16,
-    label: 'Enter an interesting room name'
-  },
-  [ENTER_PASS]: {
-    fieldType: 'password',
-    fieldName: 'pass',
-    fieldPlaceholder: 'welcome123',
-    fieldMaxLength: 16,
-    label: 'Enter a password for your room'
   }
 }
 
@@ -113,41 +54,71 @@ function AdminApp(props) {
   // so they can read from redux state and dispatch actions
   attachSocketListeners(props)
 
-  // Determine the status of the app and render accordingly
-  switch (appState.status) {
-    case ENTER_NAME: {
-      return <Landing>
-        <LandingForm
+  /**
+   * landingViewComponent returns the component that
+   * should render in the landing view based on appState.status
+   */
+  const landingViewComponent = () => {
+    // Form values dependent on current app status
+    const formValues = {
+      'enteringName': {
+        fieldType: 'text',
+        fieldName: 'name',
+        fieldPlaceholder: 'The Liberty Well',
+        fieldMaxLength: 16,
+        label: 'Enter an interesting room name'
+      },
+      'enteringPassword': {
+        fieldType: 'password',
+        fieldName: 'pass',
+        fieldPlaceholder: 'welcome123',
+        fieldMaxLength: 16,
+        label: 'Enter a password for your room'
+      }
+    }
+
+    switch (appState.status) {
+      case 'enteringName': {
+        return <LandingForm
           formData={formValues[appState.status]}
-          handleSubmit={(name) => {
-            props.updateStatus(getNextStatusInFlow(appState.status))
-            props.updateRoomName(name)
-            sendStringToSocket(JSON.stringify({
-              mType: 'SET_NAME',
-              name: name
-            }))
+          handleSubmit={() => {
+            props.updateStatus('enteringPassword')
           }}
         />
-      </Landing>
-    }
-    case ENTER_PASS: {
-      return <Landing>
-        <LandingForm
+      }
+      case 'enteringPassword': {
+        return <LandingForm
           formData={formValues[appState.status]}
-          handleSubmit={(password) => {
-            props.updateStatus(getNextStatusInFlow(appState.status))
-            sendStringToSocket(JSON.stringify({
-              mType: 'SET_PASSWORD',
-              password: password
-            }))
+          handleSubmit={() => {
+            props.updateStatus('loading')
+            props.updateOnSuccessStatus('enteringPassword') // go to app
+            props.updateLoadingMessage('Creating room...')
           }}
         />
-      </Landing>
-    }
-    default: {
-      return <Landing loading />
+      }
+      default:
+        return null
     }
   }
+
+  /**
+   * TeamApp render
+   */
+
+  return <Switch>
+    <Route exact path="/create">
+      <Landing
+        loading={appState.status === 'loading'}
+        loadingMessage={appState.loadingMessage !== null ? appState.loadingMessage : 'Loading...'}
+      >
+        {landingViewComponent()}
+      </Landing>
+    </Route>
+
+    <Route render={() => {
+      props.history.push(`/quizmaster/create`)
+    }} />
+  </Switch>
 }
 
 function mapStateToProps(state) {
@@ -158,8 +129,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    updateStatus: (status) => dispatch(updateStatus(status)),
-    updateRoomName: (name) => dispatch(updateRoomName(name))
+    updateStatus: status => dispatch(updateStatus(status)),
+    updateRoomName: name => dispatch(updateRoomName(name)),
+    updateOnSuccessStatus: status => dispatch(updateOnSuccessStatus(status)),
+    updateLoadingMessage: message => dispatch(updateLoadingMessage(message)),
   }
 }
 

@@ -2,8 +2,10 @@ import {
   combineReducers
 } from 'redux'
 
-import updateStatusReducer from './updateAppState'
+import updateAppStateReducer from './updateAppState'
+import updateFetchStateReducer from './updateFetchState'
 
 export const mainReducer = combineReducers({
-  appState: updateStatusReducer,
+  appState: updateAppStateReducer,
+  fetchState: updateFetchStateReducer
 })

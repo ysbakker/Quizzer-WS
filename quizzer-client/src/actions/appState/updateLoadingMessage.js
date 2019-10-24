@@ -1,6 +1,6 @@
 import {
   UPDATE_LOADING_MESSAGE
-} from './types'
+} from '../types'
 
 export default function updateLoadingMessageAction(message) {
   return {

@@ -1,6 +1,6 @@
 import {
   UPDATE_APP_STATUS
-} from './types'
+} from '../types'
 
 export default function updateStatusAction(status) {
   return {

@@ -4,28 +4,24 @@ import { Switch, Route } from 'react-router'
 
 import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
-import { setError, setSuccess, showAlertBar } from '../components/alertbar'
 
-import updateStatus from '../actions/updateStatus'
-import updateRoomNumber from '../actions/updateRoomNumber'
-import updateAfterLoadingStatus from '../actions/updateAfterLoadingStatus'
-import updateLoadingMessage from '../actions/updateLoadingMessage'
+import updateStatus from '../actions/appState/updateStatus'
+import updateRoomNumber from '../actions/appState/updateRoomNumber'
+import updateOnSuccessStatus from '../actions/appState/updateOnSuccessStatus'
+import updateLoadingMessage from '../actions/appState/updateLoadingMessage'
+
+import * as GLOBALS from '../globals'
 
 /********************
  ** WebSocket conf **
  ********************/
 
-const socket = new WebSocket('ws://yorricks-macbook-pro-4.local:3000')
-
-const attachSocketListeners = props => {
+const attachSocketListeners = (props, socket) => {
   socket.onerror = event => {
-    setError('Couldn\'t connect to server')
-    showAlertBar()
   }
 
   socket.onclose = event => {
-    setError('Connection closed by server')
-    showAlertBar(5000)
+
   }
 
   socket.onmessage = event => {
@@ -45,10 +41,6 @@ const attachSocketListeners = props => {
 
 function TeamApp(props) {
   const { appState } = props
-
-  // Attach websocket event listeners here
-  // so they can read from redux store and dispatch actions
-  attachSocketListeners(props)
 
   /**
    * landingViewComponent returns the component that
@@ -81,32 +73,32 @@ function TeamApp(props) {
     }
 
     switch (appState.status) {
-      case 'enteringTeam': {
+      case 'enteringRoom': {
         return <LandingForm
-          formData={formValues.enteringTeam}
-          handleSubmit={() => {
-            props.updateStatus('loading')
-            props.updateAfterLoadingStatus('enteringTeam')
-            props.updateLoadingMessage('Waiting for quiz master to verify team...')
+          formData={formValues[appState.status]}
+          handleSubmit={(room) => {
+            props.updateStatus('enteringPassword')
+            props.updateRoomNumber(room)
           }}
         />
       }
       case 'enteringPassword': {
         return <LandingForm
-          formData={formValues.enteringPassword}
+          formData={formValues[appState.status]}
           handleSubmit={() => {
             props.updateStatus('loading')
-            props.updateAfterLoadingStatus('enteringTeam')
+            props.updateOnSuccessStatus('enteringTeam')
             props.updateLoadingMessage('Verifying credentials...')
           }}
         />
       }
-      case 'enteringRoom': {
+      case 'enteringTeam': {
         return <LandingForm
-          formData={formValues.enteringRoom}
-          handleSubmit={(room) => {
-            props.updateStatus('enteringPassword')
-            props.updateRoomNumber(room)
+          formData={formValues[appState.status]}
+          handleSubmit={() => {
+            props.updateStatus('loading')
+            props.updateOnSuccessStatus('enteringTeam')
+            props.updateLoadingMessage('Waiting for quiz master to verify team...')
           }}
         />
       }
@@ -159,7 +151,7 @@ function mapDispatchToProps(dispatch) {
   return {
     updateStatus: status => dispatch(updateStatus(status)),
     updateRoomNumber: room => dispatch(updateRoomNumber(room)),
-    updateAfterLoadingStatus: status => dispatch(updateAfterLoadingStatus(status)),
+    updateOnSuccessStatus: status => dispatch(updateOnSuccessStatus(status)),
     updateLoadingMessage: message => dispatch(updateLoadingMessage(message))
   }
 }
