@@ -5,10 +5,7 @@ import { Switch, Route } from 'react-router'
 import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
 
-import updateStatus from '../actions/appState/updateStatus'
-import updateRoomNumber from '../actions/appState/updateRoomNumber'
-import updateOnSuccessStatus from '../actions/appState/updateOnSuccessStatus'
-import updateLoadingMessage from '../actions/appState/updateLoadingMessage'
+import * as appStateActions from '../actions/appStateActions'
 
 import * as GLOBALS from '../globals'
 
@@ -149,10 +146,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    updateStatus: status => dispatch(updateStatus(status)),
-    updateRoomNumber: room => dispatch(updateRoomNumber(room)),
-    updateOnSuccessStatus: status => dispatch(updateOnSuccessStatus(status)),
-    updateLoadingMessage: message => dispatch(updateLoadingMessage(message))
+    updateStatus: status => dispatch(appStateActions.updateStatusAction(status)),
+    updateRoomName: name => dispatch(appStateActions.updateRoomNameAction(name)),
+    updateOnSuccessStatus: status => dispatch(appStateActions.updateOnSuccessStatusAction(status)),
+    updateLoadingMessage: message => dispatch(appStateActions.updateLoadingMessageAction(message))
   }
 }
 

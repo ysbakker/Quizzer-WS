@@ -7,7 +7,7 @@ import {
 // Default state
 const initialState = {
   fetching: false,
-  result: 'success',
+  result: 'error',
   message: null,
 }
 

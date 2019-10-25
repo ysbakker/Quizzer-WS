@@ -5,22 +5,13 @@ import { Switch, Route } from 'react-router'
 import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
 
-import updateStatus from '../actions/appState/updateStatus'
-import updateRoomName from '../actions/appState/updateRoomName'
-import updateOnSuccessStatus from '../actions/appState/updateOnSuccessStatus'
-import updateLoadingMessage from '../actions/appState/updateLoadingMessage'
+import * as appStateActions from '../actions/appStateActions'
 
 /********************
  ** WebSocket conf **
  ********************/
 
-const socket = new WebSocket('ws://yorricks-macbook-pro-4.local:3000')
-
-const sendStringToSocket = string => {
-  socket.send(string)
-}
-
-const attachSocketListeners = props => {
+const attachSocketListeners = (props, socket) => {
   socket.onopen = () => {
   }
 
@@ -49,10 +40,6 @@ const attachSocketListeners = props => {
 
 function AdminApp(props) {
   const { appState } = props
-
-  // Attach websocket event listeners here
-  // so they can read from redux state and dispatch actions
-  attachSocketListeners(props)
 
   /**
    * landingViewComponent returns the component that
@@ -129,10 +116,10 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    updateStatus: status => dispatch(updateStatus(status)),
-    updateRoomName: name => dispatch(updateRoomName(name)),
-    updateOnSuccessStatus: status => dispatch(updateOnSuccessStatus(status)),
-    updateLoadingMessage: message => dispatch(updateLoadingMessage(message)),
+    updateStatus: status => dispatch(appStateActions.updateStatusAction(status)),
+    updateRoomName: name => dispatch(appStateActions.updateRoomNameAction(name)),
+    updateOnSuccessStatus: status => dispatch(appStateActions.updateOnSuccessStatusAction(status)),
+    updateLoadingMessage: message => dispatch(appStateActions.updateLoadingMessageAction(message))
   }
 }
 
