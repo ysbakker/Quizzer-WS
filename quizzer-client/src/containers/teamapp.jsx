@@ -6,6 +6,7 @@ import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
 
 import * as appStateActions from '../actions/appStateActions'
+import authenticateAction from '../actions/authenticateAction'
 
 import * as GLOBALS from '../globals'
 
@@ -73,7 +74,7 @@ function TeamApp(props) {
       case 'enteringRoom': {
         return <LandingForm
           formData={formValues[appState.status]}
-          handleSubmit={(room) => {
+          handleSubmit={room => {
             props.updateStatus('enteringPassword')
             props.updateRoomNumber(room)
           }}
@@ -82,8 +83,8 @@ function TeamApp(props) {
       case 'enteringPassword': {
         return <LandingForm
           formData={formValues[appState.status]}
-          handleSubmit={() => {
-            props.updateStatus('loading')
+          handleSubmit={password => {
+            props.authenticate(appState.currentRoomNumber, password)
             props.updateOnSuccessStatus('enteringTeam')
             props.updateLoadingMessage('Verifying credentials...')
           }}
@@ -146,10 +147,12 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
+    updateRoomNumber: number => dispatch(appStateActions.updateRoomNumberAction(number)),
     updateStatus: status => dispatch(appStateActions.updateStatusAction(status)),
     updateRoomName: name => dispatch(appStateActions.updateRoomNameAction(name)),
     updateOnSuccessStatus: status => dispatch(appStateActions.updateOnSuccessStatusAction(status)),
-    updateLoadingMessage: message => dispatch(appStateActions.updateLoadingMessageAction(message))
+    updateLoadingMessage: message => dispatch(appStateActions.updateLoadingMessageAction(message)),
+    authenticate: (roomid, password) => dispatch(authenticateAction(roomid, password))
   }
 }
 

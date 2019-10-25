@@ -9,14 +9,16 @@ export default class AlertBar extends React.Component {
   }
 
   componentDidMount() {
-    this.setState({
-      show: true
-    })
     setTimeout(() => {
       this.setState({
-        show: false
+        show: true
       })
-    }, 5000)
+      setTimeout(() => {
+        this.setState({
+          show: false
+        })
+      }, 5000)
+    }, 100)
   }
 
   render() {
