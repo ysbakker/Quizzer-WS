@@ -1,14 +1,11 @@
-const express = require('express')
-const ws = require('ws')
 const http = require('http')
-const mongoose = require('mongoose')
-const cors = require('cors');
+const cors = require('cors')
+const ws = require('ws')
+const express = require('express')
 const bodyParser = require('body-parser')
-const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
-
-// Import event listeners
-const messageListener = require('./messageListener');
+const mongoose = require('mongoose')
+const session = require('express-session')
+const MongoStore = require('connect-mongo')(session)
 
 const app = express();
 const server = http.createServer();
@@ -16,7 +13,7 @@ const server = http.createServer();
 const sessionParser = session({
   secret: '9jDb8AHQdY',
   resave: true,
-  saveUninitialized: false,
+  saveUninitialized: true,
   store: new MongoStore({
     mongooseConnection: mongoose.connection
   })
@@ -25,6 +22,9 @@ const sessionParser = session({
 /************************
  * Socket Server Config *
  ************************/
+
+// Import event listeners
+const messageListener = require('./messageListener');
 
 const wss = new ws.Server({
   noServer: true
@@ -75,13 +75,15 @@ const attachListeners = (socket, server) => {
  * REST API Config *
  *******************/
 // POST /quizzer/rooms -> create new room
+// DELETE /quizzer/rooms/:roomid -> delete room as quizmaster
+// PATCH /quizzer/rooms/:roomid -> update room information as quizmaster
+// GET /quizzer/rooms/:roomid/teams -> get all teams as quizmaster
 // POST /quizzer/rooms/:roomid/teams -> create new team (auth)
 // PATCH /quizzer/rooms/:roomid/teams/:teamid -> update team name
 // POST /quizzer/rooms/:roomid/rounds -> create a new round
 // PUT /quizzer/rooms/:roomid/rounds/:round/categories -> edit categories for round
-// 
 
-mongoose.connect('mongodb://localhost/Quizzer', {
+mongoose.connect('mongodb://127.0.0.1/Quizzer', {
   useNewUrlParser: true,
   useUnifiedTopology: true
 });
@@ -97,5 +99,14 @@ app.options("*", cors({
 app.use(bodyParser.json())
 app.use(sessionParser);
 
-// app.use('/', require('./routes/teams'))
-app.use('/', require('./routes/quizmaster'))
+// Attach API routes
+app.use('/quizzer', require('./routes/teams'))
+app.use('/quizzer', require('./routes/quizmaster'))
+
+// Error handling
+app.use((err, req, res, next) => {
+  res.status(err.rescode !== undefined ? err.rescode : 418)
+  res.json({
+    error: err.message
+  })
+})
