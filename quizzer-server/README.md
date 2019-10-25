@@ -1,6 +1,6 @@
 # Quizzer Server
 
-The quizzer server can host multiple Quizzer rooms at once. It sports an easy-to-use REST API for accessing the mongodb database. Quizzer server uses the WebSocket architecture to make the application real-time.
+The quizzer server can host multiple Quizzer rooms at once. It includes an easy-to-use REST API for accessing the mongodb database. Quizzer server uses the WebSocket architecture to make the application real-time.
 
 ## Installation
 To run the server, copy the files to your server and run `npm install` in the install directory.
