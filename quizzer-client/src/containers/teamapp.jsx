@@ -6,8 +6,8 @@ import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
 
 import * as appStateActions from '../actions/appStateActions'
-import authenticateAction from '../actions/authenticateAction'
-import renameTeamAction from '../actions/renameTeamAction'
+import authenticateAction from '../actions/async/authenticateAction'
+import renameTeamAction from '../actions/async/renameTeamAction'
 
 import * as GLOBALS from '../globals'
 

@@ -1,8 +1,8 @@
-import * as appState from './appStateActions'
-import * as fetchState from './fetchStateActions'
+import * as appState from '../appStateActions'
+import * as fetchState from '../fetchStateActions'
 
-import * as GLOBALS from '../globals'
-import { store } from '../index'
+import * as GLOBALS from '../../globals'
+import { store } from '../../index'
 
 export default function renameTeamAction(teamname) {
   return (dispatch, getState) => {

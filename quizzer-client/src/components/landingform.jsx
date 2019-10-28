@@ -20,7 +20,6 @@ export default class LandingForm extends React.Component {
     if (validation.max && value.toString().length > validation.max) messages.push(`Input must be less than ${validation.max} characters long`)
     if (validation.len && value.toString().length !== validation.len) messages.push(`Input must be ${validation.len} characters long`)
 
-    console.log(messages)
     return messages.length === 0 || messages
   }
 
@@ -40,7 +39,7 @@ export default class LandingForm extends React.Component {
         <p><strong>Please check your input!</strong></p>
         <ul>{state.message === null
           ? null
-          : state.message.map(msg => <li>{msg}</li>)}
+          : state.message.map(msg => <li key="msg">{msg}</li>)}
         </ul>
       </div>
       <button className="submit" onClick={(event) => {

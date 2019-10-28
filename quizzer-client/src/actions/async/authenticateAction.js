@@ -1,7 +1,7 @@
-import * as appState from './appStateActions'
-import * as fetchState from './fetchStateActions'
+import * as appState from '../appStateActions'
+import * as fetchState from '../fetchStateActions'
 
-import * as GLOBALS from '../globals'
+import * as GLOBALS from '../../globals'
 
 export default function authenticateAction(roomid, password) {
   return dispatch => {
