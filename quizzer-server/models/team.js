@@ -6,6 +6,10 @@ const teamSchema = new mongoose.Schema({
     minlength: 2,
     maxlength: 16
   },
+  verified: {
+    type: Boolean,
+    default: false
+  },
   room: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Room',
