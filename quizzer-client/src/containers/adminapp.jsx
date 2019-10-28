@@ -38,14 +38,14 @@ const attachSocketListeners = (props, socket) => {
  ** AdminApp Component **
  ************************/
 
-function AdminApp(props) {
-  const { appState } = props
-
+class AdminApp extends React.Component {
   /**
    * landingViewComponent returns the component that
    * should render in the landing view based on appState.status
    */
-  const landingViewComponent = () => {
+  landingViewComponent = () => {
+    const { props } = this
+    const { appState } = props
     // Form values dependent on current app status
     const formValues = {
       'enteringName': {
@@ -53,14 +53,22 @@ function AdminApp(props) {
         fieldName: 'name',
         fieldPlaceholder: 'The Liberty Well',
         fieldMaxLength: 16,
-        label: 'Enter an interesting room name'
+        label: 'Enter an interesting room name',
+        validation: {
+          min: 2,
+          max: 16
+        }
       },
       'enteringPassword': {
         fieldType: 'password',
         fieldName: 'pass',
         fieldPlaceholder: 'welcome123',
         fieldMaxLength: 16,
-        label: 'Enter a password for your room'
+        label: 'Enter a password for your room',
+        validation: {
+          min: 2,
+          max: 16
+        }
       }
     }
 
@@ -78,7 +86,6 @@ function AdminApp(props) {
           formData={formValues[appState.status]}
           handleSubmit={() => {
             props.updateStatus('loading')
-            props.updateOnSuccessStatus('enteringPassword') // go to app
             props.updateLoadingMessage('Creating room...')
           }}
         />
@@ -88,24 +95,34 @@ function AdminApp(props) {
     }
   }
 
+  componentDidMount() {
+    const { props } = this
+
+    props.updateStatus('enteringName')
+  }
+
   /**
    * TeamApp render
    */
 
-  return <Switch>
-    <Route exact path="/create">
-      <Landing
-        loading={appState.status === 'loading'}
-        loadingMessage={appState.loadingMessage !== null ? appState.loadingMessage : 'Loading...'}
-      >
-        {landingViewComponent()}
-      </Landing>
-    </Route>
+  render() {
+    const { props } = this
+    const { appState } = props
+    return <Switch>
+      <Route exact path="/quizmaster/create">
+        <Landing
+          loading={appState.status === 'loading'}
+          loadingMessage={appState.loadingMessage !== null ? appState.loadingMessage : 'Loading...'}
+        >
+          {this.landingViewComponent()}
+        </Landing>
+      </Route>
 
-    <Route render={() => {
-      props.history.push(`/quizmaster/create`)
-    }} />
-  </Switch>
+      <Route exact path="/quizmaster" render={() => {
+        props.history.push(`/quizmaster/create`)
+      }} />
+    </Switch>
+  }
 }
 
 function mapStateToProps(state) {
@@ -118,7 +135,6 @@ function mapDispatchToProps(dispatch) {
   return {
     updateStatus: status => dispatch(appStateActions.updateStatusAction(status)),
     updateRoomName: name => dispatch(appStateActions.updateRoomNameAction(name)),
-    updateOnSuccessStatus: status => dispatch(appStateActions.updateOnSuccessStatusAction(status)),
     updateLoadingMessage: message => dispatch(appStateActions.updateLoadingMessageAction(message))
   }
 }

@@ -1,8 +1,10 @@
 export const UPDATE_APP_STATUS = 'update app status'
 export const UPDATE_ROOM_NUMBER = 'update room number'
 export const UPDATE_ROOM_NAME = 'update room name'
-export const UPDATE_ON_SUCCESS_STATUS = 'update status when fetch is succesful'
+export const UPDATE_TEAM_ID = 'update the team id'
+export const UPDATE_TEAM_NAME = 'update the team\'s name'
 export const UPDATE_LOADING_MESSAGE = 'update loading message'
+
 export const UPDATE_FETCHING = 'update if the application is fetching'
 export const UPDATE_FETCHING_RESULT = 'update the result of the fetch (success/error)'
 export const UPDATE_FETCHING_MESSAGE = 'update the result message'

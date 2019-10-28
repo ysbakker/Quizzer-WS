@@ -1,18 +1,20 @@
 import {
   UPDATE_APP_STATUS,
-  UPDATE_ON_SUCCESS_STATUS,
   UPDATE_LOADING_MESSAGE,
   UPDATE_ROOM_NUMBER,
-  UPDATE_ROOM_NAME
+  UPDATE_ROOM_NAME,
+  UPDATE_TEAM_ID,
+  UPDATE_TEAM_NAME
 } from '../actions/types'
 
 // Default state
 const initialState = {
   status: 'enteringRoom',
-  statusOnSuccess: 'enteringTeam',
   loadingMessage: null,
   currentRoomNumber: null,
-  currentRoomName: null
+  currentRoomName: null,
+  teamId: null,
+  teamName: null
 }
 
 export default function updateAppStateReducer(state = initialState, action) {
@@ -20,15 +22,6 @@ export default function updateAppStateReducer(state = initialState, action) {
     case UPDATE_APP_STATUS: {
       const changes = {
         status: action.payload
-      }
-      return {
-        ...state,
-        ...changes
-      }
-    }
-    case UPDATE_ON_SUCCESS_STATUS: {
-      const changes = {
-        statusOnSuccess: action.payload
       }
       return {
         ...state,
@@ -56,6 +49,24 @@ export default function updateAppStateReducer(state = initialState, action) {
     case UPDATE_ROOM_NAME: {
       const changes = {
         currentRoomName: action.payload
+      }
+      return {
+        ...state,
+        ...changes
+      }
+    }
+    case UPDATE_TEAM_ID: {
+      const changes = {
+        teamId: action.payload
+      }
+      return {
+        ...state,
+        ...changes
+      }
+    }
+    case UPDATE_TEAM_NAME: {
+      const changes = {
+        teamName: action.payload
       }
       return {
         ...state,

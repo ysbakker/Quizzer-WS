@@ -11,6 +11,13 @@ $incorrect: #E63946;
   box-sizing: border-box;
 }
 
+input:focus,
+select:focus,
+textarea:focus,
+button:focus {
+  outline: none;
+}
+
 html,
 body {
   width: 100%;
@@ -101,6 +108,35 @@ a.bare-link {
     padding: .25em;
     font-style: italic;
     font-size: 20px;
+  }
+
+  .error-message {
+    width: 100%;
+    display: none;
+    padding: .5em;
+    border-radius: 4px;
+    background: lighten($incorrect, 10);
+    border: 2px solid $incorrect;
+
+    * {
+      color: #333
+    }
+
+    ul {
+      padding-left: 2em;
+    }
+  }
+
+  &.error {
+    input[type=text],
+    input[type=number],
+    input[type=password] {
+      border-bottom: 3px solid $incorrect;
+    }
+
+    .error-message {
+      display: block;
+    }
   }
 }
 
