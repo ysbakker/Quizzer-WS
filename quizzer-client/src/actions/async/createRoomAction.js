@@ -3,17 +3,15 @@ import * as fetchState from '../fetchStateActions'
 
 import * as GLOBALS from '../../globals'
 
-export default function renameTeamAction(teamname) {
+export default function createRoomAction(password) {
   return (dispatch, getState) => {
     dispatch(fetchState.updateFetchingResultAction(null))
     dispatch(fetchState.updateFetchingAction(true))
     dispatch(appState.updateStatusAction('loading'))
-    dispatch(appState.updateLoadingMessageAction('Submitting team name...'))
+    dispatch(appState.updateLoadingMessageAction('Creating room...'))
 
-    const { currentRoomNumber, teamId } = getState().appState
-
-    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/teams/${teamId}`, {
-      method: 'PATCH',
+    fetch(`${GLOBALS.API_URL}/rooms`, {
+      method: 'POST',
       cache: 'no-cache',
       credentials: 'include',
       mode: 'cors',
@@ -22,7 +20,8 @@ export default function renameTeamAction(teamname) {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        name: teamname
+        roomname: getState().appState.currentRoomName,
+        password: password
       })
     })
       .then(res => res.json()
@@ -32,16 +31,16 @@ export default function renameTeamAction(teamname) {
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(fetchState.updateFetchingResultAction('success'))
           dispatch(fetchState.updateFetchingMessageAction(parsed.success))
-          dispatch(appState.updateLoadingMessageAction('Waiting for quizmaster to verify team...'))
-          dispatch(appState.updateTeamNameAction(teamname))
+          dispatch(appState.updateRoomNumberAction(parsed.number))
+          dispatch(appState.updateRoomPasswordAction(password))
+          dispatch(appState.updateStatusAction('ready'))
         })
         .catch(parsed => {
           const { error } = parsed
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(fetchState.updateFetchingResultAction('error'))
           dispatch(fetchState.updateFetchingMessageAction(error))
-          if (res.status === 401) dispatch(appState.updateStatusAction('enteringTeam'))
-          else dispatch(appState.updateStatusAction('enteringRoom'))
+          dispatch(appState.updateStatusAction('enteringName'))
         })
       )
       .catch(err => {

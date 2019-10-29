@@ -1,6 +1,4 @@
-import {
-  combineReducers
-} from 'redux'
+import { combineReducers } from 'redux'
 
 import updateAppStateReducer from './updateAppState'
 import updateFetchStateReducer from './updateFetchState'

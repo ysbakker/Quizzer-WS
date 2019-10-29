@@ -6,6 +6,7 @@ import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
 
 import * as appStateActions from '../actions/appStateActions'
+import createRoomAction from '../actions/async/createRoomAction'
 
 /********************
  ** WebSocket conf **
@@ -76,17 +77,17 @@ class AdminApp extends React.Component {
       case 'enteringName': {
         return <LandingForm
           formData={formValues[appState.status]}
-          handleSubmit={() => {
+          handleSubmit={name => {
             props.updateStatus('enteringPassword')
+            props.updateRoomName(name)
           }}
         />
       }
       case 'enteringPassword': {
         return <LandingForm
           formData={formValues[appState.status]}
-          handleSubmit={() => {
-            props.updateStatus('loading')
-            props.updateLoadingMessage('Creating room...')
+          handleSubmit={password => {
+            props.createRoom(password)
           }}
         />
       }
@@ -135,7 +136,7 @@ function mapDispatchToProps(dispatch) {
   return {
     updateStatus: status => dispatch(appStateActions.updateStatusAction(status)),
     updateRoomName: name => dispatch(appStateActions.updateRoomNameAction(name)),
-    updateLoadingMessage: message => dispatch(appStateActions.updateLoadingMessageAction(message))
+    createRoom: password => dispatch(createRoomAction(password))
   }
 }
 

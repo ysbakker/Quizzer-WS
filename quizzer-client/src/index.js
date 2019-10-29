@@ -25,7 +25,7 @@ const logger = (store) => (next) => (action) => {
 // is the version you need if you use Redux middleware:
 const composeEnhancers = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
 
-export const store = createStore(reducer, composeEnhancers(
+const store = createStore(reducer, composeEnhancers(
   applyMiddleware(logger, ReduxThunk)
 ))
 

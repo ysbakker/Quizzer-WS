@@ -1,6 +1,7 @@
 export const UPDATE_APP_STATUS = 'update app status'
 export const UPDATE_ROOM_NUMBER = 'update room number'
 export const UPDATE_ROOM_NAME = 'update room name'
+export const UPDATE_ROOM_PASSWORD = 'update room password'
 export const UPDATE_TEAM_ID = 'update the team id'
 export const UPDATE_TEAM_NAME = 'update the team\'s name'
 export const UPDATE_LOADING_MESSAGE = 'update loading message'

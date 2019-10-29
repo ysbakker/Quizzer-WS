@@ -166,8 +166,6 @@ function mapDispatchToProps(dispatch) {
   return {
     updateRoomNumber: number => dispatch(appStateActions.updateRoomNumberAction(number)),
     updateStatus: status => dispatch(appStateActions.updateStatusAction(status)),
-    updateRoomName: name => dispatch(appStateActions.updateRoomNameAction(name)),
-    updateLoadingMessage: message => dispatch(appStateActions.updateLoadingMessageAction(message)),
     authenticate: (roomid, password) => dispatch(authenticateAction(roomid, password)),
     renameTeam: (teamname) => dispatch(renameTeamAction(teamname))
   }
