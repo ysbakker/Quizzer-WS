@@ -1,9 +1,11 @@
 import { combineReducers } from 'redux'
 
-import updateAppStateReducer from './updateAppState'
-import updateFetchStateReducer from './updateFetchState'
+import appStateReducer from './appState'
+import fetchStateReducer from './fetchState'
+import adminStateReducer from './adminState'
 
 export const mainReducer = combineReducers({
-  appState: updateAppStateReducer,
-  fetchState: updateFetchStateReducer
+  appState: appStateReducer,
+  fetchState: fetchStateReducer,
+  adminState: adminStateReducer
 })

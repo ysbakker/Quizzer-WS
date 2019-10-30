@@ -1,20 +1,17 @@
-import * as appState from '../appStateActions'
 import * as fetchState from '../fetchStateActions'
-import fetchTeams from './fetchTeamsAction'
+import * as adminState from '../adminStateActions'
 
 import * as GLOBALS from '../../globals'
 
-import { history } from '../../containers/quizzer'
-
-export default function createRoomAction() {
+export default function verifyTeamAction(teamid, accepted) {
   return (dispatch, getState) => {
     dispatch(fetchState.updateFetchingResultAction(null))
     dispatch(fetchState.updateFetchingAction(true))
-    dispatch(appState.updateStatusAction('loading'))
-    dispatch(appState.updateLoadingMessageAction('Creating room...'))
 
-    fetch(`${GLOBALS.API_URL}/rooms`, {
-      method: 'POST',
+    const { currentRoomNumber } = getState().appState
+
+    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/teams/${teamid}`, {
+      method: 'PATCH',
       cache: 'no-cache',
       credentials: 'include',
       mode: 'cors',
@@ -23,8 +20,7 @@ export default function createRoomAction() {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        roomname: getState().appState.currentRoomName,
-        password: getState().adminState.password
+        accepted: accepted
       })
     })
       .then(res => res.json()
@@ -34,16 +30,14 @@ export default function createRoomAction() {
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(fetchState.updateFetchingResultAction('success'))
           dispatch(fetchState.updateFetchingMessageAction(parsed.success))
-          dispatch(appState.updateRoomNumberAction(parsed.number))
-          dispatch(fetchTeams())
-          history.push('/quizmaster/verifyteams')
+          if (accepted) adminState.approveTeamAction(teamid)
+          else adminState.denyTeamAction(teamid)
         })
         .catch(parsed => {
           const { error } = parsed
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(fetchState.updateFetchingResultAction('error'))
           dispatch(fetchState.updateFetchingMessageAction(error))
-          dispatch(appState.updateStatusAction('enteringName'))
         })
       )
       .catch(err => {
@@ -51,7 +45,6 @@ export default function createRoomAction() {
         dispatch(fetchState.updateFetchingAction(false))
         dispatch(fetchState.updateFetchingResultAction('error'))
         dispatch(fetchState.updateFetchingMessageAction('Couldn\'t fetch from API'))
-        dispatch(appState.updateStatusAction('enteringName'))
       })
   }
 }

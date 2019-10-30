@@ -11,7 +11,7 @@ const initialState = {
   message: null,
 }
 
-export default function updateFetchStateReducer(state = initialState, action) {
+export default function fetchStateReducer(state = initialState, action) {
   switch (action.type) {
     case UPDATE_FETCHING: {
       const changes = {

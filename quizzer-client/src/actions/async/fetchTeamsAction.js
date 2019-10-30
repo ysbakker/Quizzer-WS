@@ -1,49 +1,47 @@
-import * as appState from '../appStateActions'
 import * as fetchState from '../fetchStateActions'
-import fetchTeams from './fetchTeamsAction'
+import * as adminState from '../adminStateActions'
 
 import * as GLOBALS from '../../globals'
 
-import { history } from '../../containers/quizzer'
-
-export default function createRoomAction() {
+export default function fetchTeamsAction() {
   return (dispatch, getState) => {
     dispatch(fetchState.updateFetchingResultAction(null))
     dispatch(fetchState.updateFetchingAction(true))
-    dispatch(appState.updateStatusAction('loading'))
-    dispatch(appState.updateLoadingMessageAction('Creating room...'))
 
-    fetch(`${GLOBALS.API_URL}/rooms`, {
-      method: 'POST',
+    const { currentRoomNumber } = getState().appState
+    const { pendingTeams } = getState().adminState
+
+    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/teams/`, {
+      method: 'GET',
       cache: 'no-cache',
       credentials: 'include',
       mode: 'cors',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        roomname: getState().appState.currentRoomName,
-        password: getState().adminState.password
-      })
+      }
     })
       .then(res => res.json()
         .then(parsed => new Promise(resolve => setTimeout(() => resolve(parsed), 500))) // Simulates loading time
         .then(parsed => {
           if (!res.ok) throw parsed
           dispatch(fetchState.updateFetchingAction(false))
-          dispatch(fetchState.updateFetchingResultAction('success'))
-          dispatch(fetchState.updateFetchingMessageAction(parsed.success))
-          dispatch(appState.updateRoomNumberAction(parsed.number))
-          dispatch(fetchTeams())
-          history.push('/quizmaster/verifyteams')
+
+          // Put teams in pendingTeams if they're not in it already
+          parsed.teams.forEach(team => {
+            if (!pendingTeams.includes(team) && team.name !== undefined) adminState.addTeamAction(team)
+          })
+
+          // Remove teams from pendingTeams if they no longer exist
+          pendingTeams.forEach(team => {
+            if (!parsed.teams.includes(team) || parsed.teams.indexOf(team).name === undefined) adminState.denyTeamAction(team)
+          })
         })
         .catch(parsed => {
           const { error } = parsed
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(fetchState.updateFetchingResultAction('error'))
           dispatch(fetchState.updateFetchingMessageAction(error))
-          dispatch(appState.updateStatusAction('enteringName'))
         })
       )
       .catch(err => {
@@ -51,7 +49,6 @@ export default function createRoomAction() {
         dispatch(fetchState.updateFetchingAction(false))
         dispatch(fetchState.updateFetchingResultAction('error'))
         dispatch(fetchState.updateFetchingMessageAction('Couldn\'t fetch from API'))
-        dispatch(appState.updateStatusAction('enteringName'))
       })
   }
 }

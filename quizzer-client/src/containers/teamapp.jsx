@@ -9,8 +9,6 @@ import * as appStateActions from '../actions/appStateActions'
 import authenticateAction from '../actions/async/authenticateAction'
 import renameTeamAction from '../actions/async/renameTeamAction'
 
-import * as GLOBALS from '../globals'
-
 /********************
  ** WebSocket conf **
  ********************/

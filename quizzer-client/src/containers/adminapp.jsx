@@ -5,23 +5,38 @@ import { Switch, Route } from 'react-router'
 import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
 
+import ListView from '../components/listview'
+import ApproveItem from '../components/approveitem'
+
 import * as appStateActions from '../actions/appStateActions'
+import * as adminStateActions from '../actions/adminStateActions'
+import * as fetchStateActions from '../actions/fetchStateActions'
+
 import createRoomAction from '../actions/async/createRoomAction'
+import verifyTeamAction from '../actions/async/verifyTeamAction'
+import fetchTeamsAction from '../actions/async/fetchTeamsAction'
+
+import * as GLOBALS from '../globals'
 
 /********************
  ** WebSocket conf **
  ********************/
 
-const attachSocketListeners = (props, socket) => {
+/**
+ * attachSocketListeners gets the 'props' param so it can dispatch
+ * actions to the redux store.
+ */
+const attachSocketListeners = (socket, props) => {
   socket.onopen = () => {
   }
 
   socket.onerror = event => {
-    props.updateStatus('enteringName')
+
   }
 
   socket.onclose = event => {
-    props.updateStatus('enteringName')
+    props.updateFetchingMessage('Lost connection')
+    props.updateFetchingResult('error')
   }
 
   socket.onmessage = event => {
@@ -87,7 +102,8 @@ class AdminApp extends React.Component {
         return <LandingForm
           formData={formValues[appState.status]}
           handleSubmit={password => {
-            props.createRoom(password)
+            props.updateRoomPassword(password)
+            props.createRoom()
           }}
         />
       }
@@ -99,7 +115,9 @@ class AdminApp extends React.Component {
   componentDidMount() {
     const { props } = this
 
-    props.updateStatus('enteringName')
+    if (props.appState.status === 'enteringRoom') props.updateStatus('enteringName')
+    this.socket = new WebSocket(GLOBALS.SOCKET_URL)
+    attachSocketListeners(this.socket, props)
   }
 
   /**
@@ -108,7 +126,7 @@ class AdminApp extends React.Component {
 
   render() {
     const { props } = this
-    const { appState } = props
+    const { appState, adminState } = props
     return <Switch>
       <Route exact path="/quizmaster/create">
         <Landing
@@ -117,6 +135,17 @@ class AdminApp extends React.Component {
         >
           {this.landingViewComponent()}
         </Landing>
+      </Route>
+      <Route exact path="/quizmaster/verifyteams">
+        <ListView
+          title='Approve teams'
+          items={adminState.pendingTeams.map(team => { return { id: team._id, text: team.name } })}
+          ListItemComponent={attributes => <ApproveItem
+            {...attributes}
+            acceptTeamHandler={(id) => console.log(id)}
+            denyTeamHandler={(id) => console.log(id)}
+          />}
+        />
       </Route>
 
       <Route exact path="/quizmaster" render={() => {
@@ -128,7 +157,8 @@ class AdminApp extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    appState: state.appState
+    appState: state.appState,
+    adminState: state.adminState
   }
 }
 
@@ -136,7 +166,12 @@ function mapDispatchToProps(dispatch) {
   return {
     updateStatus: status => dispatch(appStateActions.updateStatusAction(status)),
     updateRoomName: name => dispatch(appStateActions.updateRoomNameAction(name)),
-    createRoom: password => dispatch(createRoomAction(password))
+    updateRoomPassword: password => dispatch(adminStateActions.updateRoomPasswordAction(password)),
+    createRoom: password => dispatch(createRoomAction(password)),
+    verifyTeam: (teamid, accepted) => dispatch(verifyTeamAction(teamid, accepted)),
+    fetchTeams: () => dispatch(fetchTeamsAction()),
+    updateFetchingMessage: message => dispatch(fetchStateActions.updateFetchingMessageAction(message)),
+    updateFetchingResult: result => dispatch(fetchStateActions.updateFetchingResultAction(result))
   }
 }
 

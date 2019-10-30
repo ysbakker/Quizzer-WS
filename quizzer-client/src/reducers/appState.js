@@ -13,12 +13,10 @@ const initialState = {
   status: 'enteringRoom',
   loadingMessage: null,
   currentRoomNumber: null,
-  currentRoomName: null,
-  teamId: null,
-  teamName: null
+  currentRoomName: null
 }
 
-export default function updateAppStateReducer(state = initialState, action) {
+export default function appStateReducer(state = initialState, action) {
   switch (action.type) {
     case UPDATE_APP_STATUS: {
       const changes = {

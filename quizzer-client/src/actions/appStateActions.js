@@ -5,7 +5,6 @@ import {
   UPDATE_APP_STATUS,
   UPDATE_TEAM_ID,
   UPDATE_TEAM_NAME,
-  UPDATE_ROOM_PASSWORD
 } from './types'
 
 export function updateLoadingMessageAction(message) {
@@ -19,13 +18,6 @@ export function updateRoomNameAction(name) {
   return {
     type: UPDATE_ROOM_NAME,
     payload: name
-  }
-}
-
-export function updateRoomPasswordAction(password) {
-  return {
-    type: UPDATE_ROOM_PASSWORD,
-    payload: password
   }
 }
 
