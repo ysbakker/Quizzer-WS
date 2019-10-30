@@ -12,6 +12,7 @@ The Quizzer API runs on the `/quizzer` resource. All API routes are described be
 
 | Client     | Method | Route                                    | Request                 | Response                                                       | Information                                                             |
 |------------|--------|------------------------------------------|-------------------------|----------------------------------------------------------------|-------------------------------------------------------------------------|
+| Any        | GET    | /                                        | -                       | `{ gamestate }`                                                | If the client already has a session, give him the gamestate |
 | Quizmaster | POST   | /rooms                                   | -                       | `{ success: 'Created room succesfully', number }`              | Creates a new room and authenticates the user as quizmaster. |
 | Quizmaster | DELETE | /rooms/:roomid                           | -                       | `{ success: 'Deleted room succesfully' }`                      | Deletes the specified room |
 | Quizmaster | PATCH  | /rooms/:roomid                           | `{ property: value }`   | `{ success: 'Updated room data succesfully', property: value}` | Allows the quizmaster to update the room data, like the current round |

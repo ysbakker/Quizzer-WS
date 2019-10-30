@@ -1,6 +1,7 @@
 const models = require('../models/index')
 
 // Check if the room exists
+// Should only be used in-line because it accesses route parameters
 const checkIfRoomExists = async (req, res, next) => {
   const { roomid } = req.params
   const { room } = models
@@ -17,18 +18,8 @@ const checkIfRoomExists = async (req, res, next) => {
   next()
 }
 
-const checkIfUserIsAuthenticated = async (req, res, next) => {
-  const { roomid } = req.params
-  const { auth, room } = req.session
-  const { model } = models.room
-
-  const r = await model.findOne({ number: roomid })
-
-  if (r._id.toString() !== room.toString()) {
-    const e = new Error('You are not authenticated for this room!')
-    e.rescode = 403
-    return next(e)
-  }
+const checkIfUserIsAuthenticated = (req, res, next) => {
+  const { auth } = req.session
 
   if (auth === 1) return next()
   else {
@@ -38,18 +29,8 @@ const checkIfUserIsAuthenticated = async (req, res, next) => {
   }
 }
 
-const checkIfUserIsQuizmaster = async (req, res, next) => {
-  const { roomid } = req.params
-  const { role, room } = req.session
-  const { model } = models.room
-
-  const r = await model.findOne({ number: roomid })
-
-  if (r._id.toString() !== room.toString()) {
-    const e = new Error('You don\'t have access to this room!')
-    e.rescode = 403
-    return next(e)
-  }
+const checkIfUserIsQuizmaster = (req, res, next) => {
+  const { role } = req.session
 
   if (role === 'quizmaster') return next()
   else {
@@ -59,8 +40,27 @@ const checkIfUserIsQuizmaster = async (req, res, next) => {
   }
 }
 
+/**
+ * Should only be used in-line because it accesses route parameters
+ */
+const checkIfUserIsInRoom = async (req, res, next) => {
+  const { roomid } = req.params
+  const { model } = models.room
+  const { room } = req.session
+
+  const r = await model.findOne({ number: roomid })
+
+  if (r._id.toString() !== room.toString()) {
+    const e = new Error('You don\'t have access to this room!')
+    e.rescode = 403
+    return next(e)
+  }
+  next()
+}
+
 module.exports = {
   checkIfRoomExists,
   checkIfUserIsAuthenticated,
-  checkIfUserIsQuizmaster
+  checkIfUserIsQuizmaster,
+  checkIfUserIsInRoom
 }

@@ -7,6 +7,9 @@ const mongoose = require('mongoose')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
 
+const middleware = require('./routes/middleware')
+const models = require('./models/index')
+
 const app = express();
 const server = http.createServer();
 
@@ -22,9 +25,6 @@ const sessionParser = session({
 /************************
  * Socket Server Config *
  ************************/
-
-// Import event listeners
-const messageListener = require('./messageListener');
 
 const wss = new ws.Server({
   noServer: true
@@ -48,8 +48,12 @@ server.on("upgrade", (request, socket, head) => {
 })
 
 // Handle new socket connection, this means HTTP upgrade was OK
-wss.on("connection", socket => {
-  attachListeners(socket, wss)
+wss.on("connection", (socket, req) => {
+  const { session } = req
+  socket.role = session.role
+  socket.room = session.room
+  socket.teamid = session.teamid
+  attachListeners(socket, wss, session)
 })
 
 server.on('request', app);
@@ -57,31 +61,20 @@ server.listen(3000, () => {
   console.log("The Server is lisening on port 3000.")
 });
 
-const attachListeners = (socket, server) => {
-  socket.on('message', message => messageListener(message, socket, server))
+const attachListeners = (socket, server, session) => {
+  socket.on('message', message => {
+
+  })
 
   socket.on('close', () => {
-    if (socket.roomid !== undefined) {
-      // Remove socket from its room's 'team' array
-      const room = server.rooms.find(room => room.id === socket.roomid);
-      room.teams = room.teams.filter(team => {
-        return team !== socket
-      })
-    }
+
   })
 }
 
 /*******************
  * REST API Config *
  *******************/
-// POST /quizzer/rooms -> create new room
-// DELETE /quizzer/rooms/:roomid -> delete room as quizmaster
-// PATCH /quizzer/rooms/:roomid -> update room information as quizmaster
-// GET /quizzer/rooms/:roomid/teams -> get all teams as quizmaster
-// POST /quizzer/rooms/:roomid/teams -> create new team (auth)
-// PATCH /quizzer/rooms/:roomid/teams/:teamid -> update team name
-// POST /quizzer/rooms/:roomid/rounds -> create a new round
-// PUT /quizzer/rooms/:roomid/rounds/:round/categories -> edit categories for round
+// See README.md for API routes
 
 mongoose.connect('mongodb://127.0.0.1/Quizzer', {
   useNewUrlParser: true,
@@ -102,8 +95,7 @@ app.use(bodyParser.json())
 app.use(sessionParser);
 
 // Attach API routes
-app.use('/quizzer', require('./routes/teams'))
-app.use('/quizzer', require('./routes/quizmaster'))
+app.use('/quizzer', require('./routes/quizzer'))
 
 // Error handling
 app.use((err, req, res, next) => {
