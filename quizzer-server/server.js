@@ -92,10 +92,12 @@ app.use(cors({
   origin: true,
   credentials: true
 }));
+
 app.options("*", cors({
   origin: true,
   credentials: true
 }));
+
 app.use(bodyParser.json())
 app.use(sessionParser);
 

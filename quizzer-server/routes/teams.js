@@ -40,7 +40,9 @@ router.post('/rooms/:roomid/teams', middleware.checkIfRoomExists, async (req, re
   })
 })
 
-router.patch('/rooms/:roomid/teams/:teamid', middleware.checkIfRoomExists, async (req, res, next) => {
+router.patch('/rooms/:roomid/teams/:teamid', middleware.checkIfRoomExists, middleware.checkIfUserIsAuthenticated, async (req, res, next) => {
+  // This route should not be accessed by the quizmaster
+  if (req.session.role === 'quizmaster') return next()
   const { name } = req.body
   const { teamid, roomid } = req.params
   const { team, room } = models
@@ -62,7 +64,7 @@ router.patch('/rooms/:roomid/teams/:teamid', middleware.checkIfRoomExists, async
     return next(e)
   }
 
-  t.name = name
+  if (name !== undefined) t.name = name
 
   try {
     await t.save()

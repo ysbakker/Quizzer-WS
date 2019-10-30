@@ -13,7 +13,7 @@ router.post('/rooms', async (req, res, next) => {
   if (password === undefined || roomname === undefined) {
     const e = new Error('No room name or password specified')
     e.rescode = 400
-    throw e
+    return next(e)
   }
   const { model } = models.room
 
@@ -45,7 +45,57 @@ router.post('/rooms', async (req, res, next) => {
   })
 })
 
-router.use(middleware.checkIfUserIsAuthenticated)
-router.use(middleware.checkIfUserIsQuizmaster)
+router.get('/rooms/:roomid/teams', middleware.checkIfRoomExists, middleware.checkIfUserIsQuizmaster, async (req, res, next) => {
+  const { model } = models.room
+  const { roomid } = req.params
+
+  const room = await model.findOne({
+    number: roomid
+  }).populate('teams')
+
+  res.json({
+    teams: room.teams
+  })
+})
+
+router.patch('/rooms/:roomid/teams/:teamid', middleware.checkIfRoomExists, middleware.checkIfUserIsQuizmaster, async (req, res, next) => {
+  const { team, room } = models
+  const { roomid, teamid } = req.params
+  const { verified, name } = req.body
+
+  const t = await team.model.findById(teamid)
+  const r = await room.model.findOne({ number: roomid })
+
+  // Check if team is actually in the specified room
+  if (!r.teams.includes(t._id)) {
+    const e = new Error('This team is not in your room!')
+    e.rescode = 404
+    return next(e)
+  }
+
+  const operations = [{ operation: 'verified', val: verified }, { operation: 'name', val: name }]
+
+  // Allowed PATCH operations
+  if (operations.every(i => i.val === undefined)) {
+    const e = new Error('Invalid PATCH operation!')
+    e.rescode = 403
+    return next(e)
+  }
+
+  operations.forEach(op => {
+    if (op.val !== undefined) t[op.operation] = op.val
+  })
+
+  try {
+    await t.save()
+  } catch (err) {
+    const e = new Error(`Validation failed - ${err.message}`)
+    e.rescode = 400
+    return next(e)
+  }
+  res.json(Object.assign({
+    success: `Changed values succesfully`
+  }, ...operations.map(op => ({ [op.operation]: op.val }))))
+})
 
 module.exports = router
