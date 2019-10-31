@@ -1,8 +1,8 @@
 import * as appState from '../appStateActions'
 import * as fetchState from '../fetchStateActions'
-import fetchTeams from './fetchTeamsAction'
 
 import * as GLOBALS from '../../globals'
+import { createConnectedSocket } from '../../socket'
 
 import { history } from '../../containers/quizzer'
 
@@ -35,7 +35,10 @@ export default function createRoomAction() {
           dispatch(fetchState.updateFetchingResultAction('success'))
           dispatch(fetchState.updateFetchingMessageAction(parsed.success))
           dispatch(appState.updateRoomNumberAction(parsed.number))
-          dispatch(fetchTeams())
+
+          // open socket
+          dispatch(appState.setSocketAction(createConnectedSocket(dispatch)))
+
           history.push('/quizmaster/verifyteams')
         })
         .catch(parsed => {

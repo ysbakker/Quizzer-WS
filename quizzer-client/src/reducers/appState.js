@@ -5,7 +5,8 @@ import {
   UPDATE_ROOM_NAME,
   UPDATE_TEAM_ID,
   UPDATE_TEAM_NAME,
-  UPDATE_ROOM_PASSWORD
+  UPDATE_ROOM_PASSWORD,
+  SET_SOCKET
 } from '../actions/types'
 
 // Default state
@@ -72,11 +73,20 @@ export default function appStateReducer(state = initialState, action) {
         ...changes
       }
     }
-
     case UPDATE_ROOM_PASSWORD: {
       const changes = {
         password: action.payload
       }
+      return {
+        ...state,
+        ...changes
+      }
+    }
+    case SET_SOCKET: {
+      const changes = {
+        socket: action.payload
+      }
+
       return {
         ...state,
         ...changes

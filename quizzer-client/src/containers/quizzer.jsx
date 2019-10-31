@@ -7,34 +7,13 @@ import TeamApp from './teamapp'
 import AdminApp from './adminapp'
 import AlertBar from '../components/alertbar'
 
-import * as GLOBALS from '../globals'
+import recoverStateAction from '../actions/async/recoverStateAction'
 
 export const history = createBrowserHistory()
 
 class Quizzer extends React.Component {
   componentDidMount() {
-    // Fetch game state from server
-    fetch(`${GLOBALS.API_URL}`, {
-      method: 'GET',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
-    })
-      .then(res => res.json()
-        .then(parsed => {
-          if (!res.ok) throw parsed
-        })
-        .catch(parsed => {
-          const { error } = parsed
-        })
-      )
-      .catch(err => {
-        console.log('fetch error: ', err)
-      })
+    this.props.recoverState()
   }
 
   render() {
@@ -46,6 +25,7 @@ class Quizzer extends React.Component {
           success={props.fetchState.result === 'success'}
         />
         : null}
+      {props.fetchState.fetching ? <img className="fetching-indicator" src="/img/fetching.svg" alt="loading spinner to indicate fetching state" /> : null}
       <Switch>
         <Route path="/quizmaster" component={AdminApp} />
         <Route path="/:roomid" component={TeamApp} />
@@ -61,4 +41,10 @@ function mapStateToProps(state) {
   }
 }
 
-export default connect(mapStateToProps)(Quizzer)
+function mapDispatchToProps(dispatch) {
+  return {
+    recoverState: () => dispatch(recoverStateAction())
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Quizzer)

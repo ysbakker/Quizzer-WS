@@ -9,29 +9,6 @@ import * as appStateActions from '../actions/appStateActions'
 import authenticateAction from '../actions/async/authenticateAction'
 import renameTeamAction from '../actions/async/renameTeamAction'
 
-/********************
- ** WebSocket conf **
- ********************/
-
-const attachSocketListeners = (props, socket) => {
-  socket.onerror = event => {
-  }
-
-  socket.onclose = event => {
-
-  }
-
-  socket.onmessage = event => {
-    const msg = JSON.parse(event.data)
-
-    switch (msg.mType) {
-      default:
-        console.log('Message with unknown mType received:', msg)
-        break
-    }
-  }
-}
-
 /***********************
  ** TeamApp Component **
  ***********************/

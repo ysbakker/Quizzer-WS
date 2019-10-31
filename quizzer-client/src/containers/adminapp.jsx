@@ -16,40 +16,6 @@ import createRoomAction from '../actions/async/createRoomAction'
 import verifyTeamAction from '../actions/async/verifyTeamAction'
 import fetchTeamsAction from '../actions/async/fetchTeamsAction'
 
-import * as GLOBALS from '../globals'
-
-/********************
- ** WebSocket conf **
- ********************/
-
-/**
- * attachSocketListeners gets the 'props' param so it can dispatch
- * actions to the redux store.
- */
-const attachSocketListeners = (socket, props) => {
-  socket.onopen = () => {
-  }
-
-  socket.onerror = event => {
-
-  }
-
-  socket.onclose = event => {
-    props.updateFetchingMessage('Lost connection')
-    props.updateFetchingResult('error')
-  }
-
-  socket.onmessage = event => {
-    const msg = JSON.parse(event.data)
-
-    switch (msg.mType) {
-      default:
-        console.log('Message with unknown mType received:', msg)
-        break
-    }
-  }
-}
-
 /************************
  ** AdminApp Component **
  ************************/
@@ -116,8 +82,8 @@ class AdminApp extends React.Component {
     const { props } = this
 
     if (props.appState.status === 'enteringRoom') props.updateStatus('enteringName')
-    this.socket = new WebSocket(GLOBALS.SOCKET_URL)
-    attachSocketListeners(this.socket, props)
+    // this.socket = new WebSocket(GLOBALS.SOCKET_URL)
+    // attachSocketListeners(this.socket, props)
   }
 
   /**

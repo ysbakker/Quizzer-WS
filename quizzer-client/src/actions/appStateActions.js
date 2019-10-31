@@ -5,6 +5,7 @@ import {
   UPDATE_APP_STATUS,
   UPDATE_TEAM_ID,
   UPDATE_TEAM_NAME,
+  SET_SOCKET
 } from './types'
 
 export function updateLoadingMessageAction(message) {
@@ -46,5 +47,12 @@ export function updateTeamNameAction(name) {
   return {
     type: UPDATE_TEAM_NAME,
     payload: name
+  }
+}
+
+export function setSocketAction(socket) {
+  return {
+    type: SET_SOCKET,
+    payload: socket
   }
 }

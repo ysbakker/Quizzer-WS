@@ -5,7 +5,6 @@ import * as GLOBALS from '../../globals'
 
 export default function fetchTeamsAction() {
   return (dispatch, getState) => {
-    dispatch(fetchState.updateFetchingResultAction(null))
     dispatch(fetchState.updateFetchingAction(true))
 
     const { currentRoomNumber } = getState().appState
@@ -39,6 +38,7 @@ export default function fetchTeamsAction() {
         })
         .catch(parsed => {
           const { error } = parsed
+          dispatch(fetchState.updateFetchingResultAction(null))
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(fetchState.updateFetchingResultAction('error'))
           dispatch(fetchState.updateFetchingMessageAction(error))
@@ -46,6 +46,7 @@ export default function fetchTeamsAction() {
       )
       .catch(err => {
         console.log('fetch error: ', err)
+        dispatch(fetchState.updateFetchingResultAction(null))
         dispatch(fetchState.updateFetchingAction(false))
         dispatch(fetchState.updateFetchingResultAction('error'))
         dispatch(fetchState.updateFetchingMessageAction('Couldn\'t fetch from API'))

@@ -4,6 +4,7 @@ export const UPDATE_ROOM_NAME = 'update room name'
 export const UPDATE_TEAM_ID = 'update the team id'
 export const UPDATE_TEAM_NAME = 'update the team\'s name'
 export const UPDATE_LOADING_MESSAGE = 'update loading message'
+export const SET_SOCKET = 'set the currently connected websocket'
 
 export const UPDATE_ROOM_PASSWORD = 'update room password'
 export const APPROVE_TEAM = 'approve team name'

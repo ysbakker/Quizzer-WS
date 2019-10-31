@@ -30,6 +30,13 @@ body {
   padding: 1em;
 }
 
+.fetching-indicator {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 20px;
+}
+
 .alert-bar {
   z-index: 10;
   position: absolute;

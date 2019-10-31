@@ -2,6 +2,7 @@ import * as appState from '../appStateActions'
 import * as fetchState from '../fetchStateActions'
 
 import * as GLOBALS from '../../globals'
+import { createConnectedSocket } from '../../socket'
 
 export default function authenticateAction(roomid, password) {
   return dispatch => {
@@ -33,6 +34,9 @@ export default function authenticateAction(roomid, password) {
           dispatch(appState.updateRoomNameAction(parsed.roomname))
           dispatch(appState.updateTeamIdAction(parsed.teamid))
           dispatch(appState.updateStatusAction('enteringTeam'))
+
+          // open socket
+          dispatch(appState.setSocketAction(createConnectedSocket(dispatch)))
         })
         .catch(parsed => {
           const { error } = parsed
