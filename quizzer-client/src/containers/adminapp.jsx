@@ -108,8 +108,8 @@ class AdminApp extends React.Component {
           items={adminState.pendingTeams.map(team => { return { id: team._id, text: team.name } })}
           ListItemComponent={attributes => <ApproveItem
             {...attributes}
-            acceptTeamHandler={(id) => console.log(id)}
-            denyTeamHandler={(id) => console.log(id)}
+            acceptTeamHandler={(id) => props.verifyTeam(id, true)}
+            denyTeamHandler={(id) => props.verifyTeam(id, false)}
           />}
         />
       </Route>

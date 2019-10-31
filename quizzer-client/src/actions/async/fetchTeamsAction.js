@@ -21,19 +21,22 @@ export default function fetchTeamsAction() {
       }
     })
       .then(res => res.json()
-        .then(parsed => new Promise(resolve => setTimeout(() => resolve(parsed), 500))) // Simulates loading time
+        // .then(parsed => new Promise(resolve => setTimeout(() => resolve(parsed), 500))) // Simulates loading time
         .then(parsed => {
           if (!res.ok) throw parsed
           dispatch(fetchState.updateFetchingAction(false))
 
           // Put teams in pendingTeams if they're not in it already
           parsed.teams.forEach(team => {
-            if (!pendingTeams.includes(team) && team.name !== undefined) adminState.addTeamAction(team)
+            if (pendingTeams.every(pt => pt._id !== team._id) && team.name !== undefined) dispatch(adminState.addTeamAction(team))
+            if (team.verified) dispatch(adminState.approveTeamAction(team._id))
           })
 
           // Remove teams from pendingTeams if they no longer exist
           pendingTeams.forEach(team => {
-            if (!parsed.teams.includes(team) || parsed.teams.indexOf(team).name === undefined) adminState.denyTeamAction(team)
+            if (parsed.teams.every(t => t._id !== team._id) || parsed.teams.find(t => t._id === team._id).name === undefined) {
+              dispatch(adminState.denyTeamAction(team._id))
+            }
           })
         })
         .catch(parsed => {

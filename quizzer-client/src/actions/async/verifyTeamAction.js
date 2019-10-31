@@ -19,9 +19,13 @@ export default function verifyTeamAction(teamid, accepted) {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        accepted: accepted
-      })
+      body: accepted ?
+        JSON.stringify({
+          verified: true
+        }) :
+        JSON.stringify({
+          denied: true
+        })
     })
       .then(res => res.json()
         .then(parsed => new Promise(resolve => setTimeout(() => resolve(parsed), 500))) // Simulates loading time

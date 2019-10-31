@@ -25,7 +25,7 @@ export default function adminStateReducer(state = initialState, action) {
     }
     case APPROVE_TEAM: {
       const approvedTeams = state.approvedTeams.concat(action.payload)
-      const pendingTeams = state.pendingTeams.filter(team => team !== action.payload)
+      const pendingTeams = state.pendingTeams.filter(team => team._id !== action.payload)
       const changes = {
         approvedTeams: approvedTeams,
         pendingTeams: pendingTeams
@@ -36,7 +36,7 @@ export default function adminStateReducer(state = initialState, action) {
       }
     }
     case DENY_TEAM: {
-      const pendingTeams = state.pendingTeams.filter(team => team !== action.payload)
+      const pendingTeams = state.pendingTeams.filter(team => team._id !== action.payload)
       const changes = {
         pendingTeams: pendingTeams
       }

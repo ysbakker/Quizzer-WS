@@ -2,6 +2,8 @@ import * as fetchState from '../fetchStateActions'
 import * as adminState from '../adminStateActions'
 import * as appState from '../appStateActions'
 
+import fetchTeams from './fetchTeamsAction'
+
 import * as GLOBALS from '../../globals'
 import { createConnectedSocket } from '../../socket'
 
@@ -37,8 +39,9 @@ export default function recoverStateAction() {
           dispatch(appState.setSocketAction(createConnectedSocket(dispatch)))
 
           if (parsed.role === 'quizmaster') {
-            history.replace('/quizmaster')
+            history.replace('/quizmaster/verifyteams')
             dispatch(adminState.updateRoomPasswordAction(parsed.password))
+            dispatch(fetchTeams())
           } else {
             dispatch(appState.updateTeamIdAction(parsed.team._id))
             if (parsed.team.name === undefined) {
