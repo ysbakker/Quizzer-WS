@@ -4,6 +4,8 @@ import { Switch, Route } from 'react-router'
 
 import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
+import Logo from '../components/logo'
+import LoadingSpinner from '../components/loadingspinner'
 
 import * as appStateActions from '../actions/appStateActions'
 import authenticateAction from '../actions/async/authenticateAction'
@@ -100,12 +102,19 @@ class TeamApp extends React.Component {
   render() {
     const { props } = this
     const { appState } = props
+
+    if (appState.status === 'loading') return <div className="team-landing">
+      <Logo />
+      <LoadingSpinner
+        text={appState.loadingMessage !== undefined && appState.loadingMessage !== null
+          ? appState.loadingMessage
+          : "Waiting..."}
+      />
+    </div>
+
     return <Switch>
       <Route exact path="/authenticate">
-        <Landing
-          loading={appState.status === 'loading'}
-          loadingMessage={appState.loadingMessage !== null ? appState.loadingMessage : 'Loading...'}
-        >
+        <Landing>
           {this.landingViewComponent()}
         </Landing>
       </Route>

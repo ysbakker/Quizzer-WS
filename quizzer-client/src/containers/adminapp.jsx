@@ -7,6 +7,8 @@ import LandingForm from '../components/landingform'
 
 import ListView from '../components/listview'
 import ApproveItem from '../components/approveitem'
+import Logo from '../components/logo'
+import LoadingSpinner from '../components/loadingspinner'
 
 import * as appStateActions from '../actions/appStateActions'
 import * as adminStateActions from '../actions/adminStateActions'
@@ -82,8 +84,6 @@ class AdminApp extends React.Component {
     const { props } = this
 
     if (props.appState.status === 'enteringRoom') props.updateStatus('enteringName')
-    // this.socket = new WebSocket(GLOBALS.SOCKET_URL)
-    // attachSocketListeners(this.socket, props)
   }
 
   /**
@@ -93,12 +93,19 @@ class AdminApp extends React.Component {
   render() {
     const { props } = this
     const { appState, adminState } = props
+
+    if (appState.status === 'loading') return <div className="team-landing">
+      <Logo />
+      <LoadingSpinner
+        text={appState.loadingMessage !== undefined && appState.loadingMessage !== null
+          ? appState.loadingMessage
+          : "Waiting..."}
+      />
+    </div>
+
     return <Switch>
       <Route exact path="/quizmaster/create">
-        <Landing
-          loading={appState.status === 'loading'}
-          loadingMessage={appState.loadingMessage !== null ? appState.loadingMessage : 'Loading...'}
-        >
+        <Landing>
           {this.landingViewComponent()}
         </Landing>
       </Route>

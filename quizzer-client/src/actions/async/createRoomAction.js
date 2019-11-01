@@ -31,15 +31,20 @@ export default function createRoomAction() {
         .then(parsed => new Promise(resolve => setTimeout(() => resolve(parsed), 500))) // Simulates loading time
         .then(parsed => {
           if (!res.ok) throw parsed
+          dispatch(appState.updateStatusAction('verifyTeams'))
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(fetchState.updateFetchingResultAction('success'))
           dispatch(fetchState.updateFetchingMessageAction(parsed.success))
           dispatch(appState.updateRoomNumberAction(parsed.number))
 
-          // open socket
-          dispatch(appState.setSocketAction(createConnectedSocket(dispatch)))
+          /**
+           * Open a socket and store it in 'window'
+           * -> To prevent complicated redux middleware
+           * -> To prevent storing large socket object in redux store
+           */
+          window.socket = createConnectedSocket(dispatch)
 
-          history.push('/quizmaster/verifyteams')
+          history.replace('/quizmaster/verifyteams')
         })
         .catch(parsed => {
           const { error } = parsed

@@ -35,8 +35,12 @@ export default function authenticateAction(roomid, password) {
           dispatch(appState.updateTeamIdAction(parsed.teamid))
           dispatch(appState.updateStatusAction('enteringTeam'))
 
-          // open socket
-          dispatch(appState.setSocketAction(createConnectedSocket(dispatch)))
+          /**
+           * Open a socket and store it in 'window'
+           * -> To prevent complicated redux middleware
+           * -> To prevent storing large socket object in redux store
+           */
+          window.socket = createConnectedSocket(dispatch)
         })
         .catch(parsed => {
           const { error } = parsed

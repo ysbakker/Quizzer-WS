@@ -14,7 +14,7 @@ export default function recoverStateAction() {
     dispatch(fetchState.updateFetchingResultAction(null))
     dispatch(fetchState.updateFetchingAction(true))
 
-    // Fetch game state from server
+    // Fetch game state from server 
     fetch(`${GLOBALS.API_URL}`, {
       method: 'GET',
       credentials: 'include',
@@ -35,8 +35,12 @@ export default function recoverStateAction() {
           dispatch(appState.updateRoomNameAction(parsed.name))
           dispatch(appState.updateRoomNumberAction(parsed.number))
 
-          // open socket
-          dispatch(appState.setSocketAction(createConnectedSocket(dispatch)))
+          /**
+           * Open a socket and store it in 'window'
+           * -> To prevent complicated redux middleware
+           * -> To prevent storing large socket object in redux store
+           */
+          window.socket = createConnectedSocket(dispatch)
 
           if (parsed.role === 'quizmaster') {
             history.replace('/quizmaster/verifyteams')
@@ -52,7 +56,7 @@ export default function recoverStateAction() {
               dispatch(appState.updateStatusAction('loading'))
               dispatch(appState.updateLoadingMessageAction('Waiting for quizmaster to verify team...'))
             } else if (parsed.team.verified) {
-              history.replace('/game')
+              history.replace('/quiz')
               // Team name is verified, team is in the game
             }
           }
