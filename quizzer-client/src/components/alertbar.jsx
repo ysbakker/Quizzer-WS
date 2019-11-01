@@ -26,7 +26,11 @@ export default class AlertBar extends React.Component {
 
   render() {
     const { success, message } = this.props
-    return <div className={`alert-bar ${success ? 'success' : 'error'} ${this.state.show ? 'show' : ''}`}>
+    return <div
+      onClick={() => {
+        this.setState({ show: false })
+      }}
+      className={`alert-bar ${success ? 'success' : 'error'} ${this.state.show ? 'show' : ''}`}>
       <p>{message}</p>
     </div>
   }

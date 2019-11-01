@@ -2,7 +2,8 @@ import {
   UPDATE_ROOM_PASSWORD,
   APPROVE_TEAM,
   DENY_TEAM,
-  ADD_TEAM
+  ADD_TEAM,
+  CLEAR_TEAMS
 } from '../actions/types'
 
 // Default state
@@ -24,7 +25,7 @@ export default function adminStateReducer(state = initialState, action) {
       }
     }
     case APPROVE_TEAM: {
-      const approvedTeams = state.approvedTeams.concat(action.payload)
+      const approvedTeams = state.approvedTeams.concat(state.pendingTeams.find(team => team._id === action.payload))
       const pendingTeams = state.pendingTeams.filter(team => team._id !== action.payload)
       const changes = {
         approvedTeams: approvedTeams,
@@ -49,6 +50,16 @@ export default function adminStateReducer(state = initialState, action) {
       const pendingTeams = state.pendingTeams.concat(action.payload)
       const changes = {
         pendingTeams: pendingTeams
+      }
+      return {
+        ...state,
+        ...changes
+      }
+    }
+    case CLEAR_TEAMS: {
+      const changes = {
+        pendingTeams: [],
+        approvedTeams: []
       }
       return {
         ...state,

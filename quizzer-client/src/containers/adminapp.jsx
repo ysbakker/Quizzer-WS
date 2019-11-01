@@ -5,10 +5,12 @@ import { Switch, Route } from 'react-router'
 import Landing from '../components/landing'
 import LandingForm from '../components/landingform'
 
-import ListView from '../components/listview'
-import ApproveItem from '../components/approveitem'
 import Logo from '../components/logo'
 import LoadingSpinner from '../components/loadingspinner'
+import TopPanel from '../components/toppanel'
+import InfoPanel from '../components/infopanel';
+import ListView from '../components/listview'
+import ApproveItem from '../components/approveitem'
 
 import * as appStateActions from '../actions/appStateActions'
 import * as adminStateActions from '../actions/adminStateActions'
@@ -17,6 +19,8 @@ import * as fetchStateActions from '../actions/fetchStateActions'
 import createRoomAction from '../actions/async/createRoomAction'
 import verifyTeamAction from '../actions/async/verifyTeamAction'
 import fetchTeamsAction from '../actions/async/fetchTeamsAction'
+import TeamsPanel from '../components/teamspanel';
+import ActionButton from '../components/actionbutton';
 
 /************************
  ** AdminApp Component **
@@ -92,7 +96,7 @@ class AdminApp extends React.Component {
 
   render() {
     const { props } = this
-    const { appState, adminState } = props
+    const { appState, adminState, quizState } = props
 
     if (appState.status === 'loading') return <div className="team-landing">
       <Logo />
@@ -110,15 +114,36 @@ class AdminApp extends React.Component {
         </Landing>
       </Route>
       <Route exact path="/quizmaster/verifyteams">
-        <ListView
-          title='Approve teams'
-          items={adminState.pendingTeams.map(team => { return { id: team._id, text: team.name } })}
-          ListItemComponent={attributes => <ApproveItem
-            {...attributes}
-            acceptTeamHandler={(id) => props.verifyTeam(id, true)}
-            denyTeamHandler={(id) => props.verifyTeam(id, false)}
-          />}
-        />
+        <div className="admin-container">
+          <div className="admin-left">
+            <TopPanel
+              roomid={appState.currentRoomNumber}
+              roomname={appState.currentRoomName}
+            />
+            <ListView
+              title='Approve teams'
+              items={adminState.pendingTeams.map(team => { return { id: team._id, text: team.name } })}
+              ListItemComponent={attributes => <ApproveItem
+                {...attributes}
+                acceptTeamHandler={(id) => props.verifyTeam(id, true)}
+                denyTeamHandler={(id) => props.verifyTeam(id, false)}
+              />}
+            />
+          </div>
+          <div className="admin-right">
+            <InfoPanel
+              roomname={appState.currentRoomName}
+            />
+            <TeamsPanel
+              teams={adminState.approvedTeams}
+            />
+            <ActionButton
+              buttons={[
+                { text: `Start round ${quizState.round + 1}` }
+              ]}
+            />
+          </div>
+        </div>
       </Route>
 
       <Route exact path="/quizmaster" render={() => {
@@ -131,7 +156,8 @@ class AdminApp extends React.Component {
 function mapStateToProps(state) {
   return {
     appState: state.appState,
-    adminState: state.adminState
+    adminState: state.adminState,
+    quizState: state.quizState
   }
 }
 

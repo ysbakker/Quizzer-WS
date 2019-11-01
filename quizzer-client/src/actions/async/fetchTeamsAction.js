@@ -2,6 +2,7 @@ import * as fetchState from '../fetchStateActions'
 import * as adminState from '../adminStateActions'
 
 import * as GLOBALS from '../../globals'
+import verifyTeamAction from './verifyTeamAction'
 
 export default function fetchTeamsAction() {
   return (dispatch, getState) => {
@@ -26,16 +27,14 @@ export default function fetchTeamsAction() {
           if (!res.ok) throw parsed
           dispatch(fetchState.updateFetchingAction(false))
 
-          // Put teams in pendingTeams if they're not in it already
-          parsed.teams.forEach(team => {
-            if (pendingTeams.every(pt => pt._id !== team._id) && team.name !== undefined) dispatch(adminState.addTeamAction(team))
-            if (team.verified) dispatch(adminState.approveTeamAction(team._id))
-          })
+          // First, clear all teams
+          dispatch(adminState.clearTeamsAction())
 
-          // Remove teams from pendingTeams if they no longer exist
-          pendingTeams.forEach(team => {
-            if (parsed.teams.every(t => t._id !== team._id) || parsed.teams.find(t => t._id === team._id).name === undefined) {
-              dispatch(adminState.denyTeamAction(team._id))
+          // Put teams in pendingTeams and approve if they're already verified
+          parsed.teams.forEach(team => {
+            if (team.name !== undefined) {
+              dispatch(adminState.addTeamAction(team))
+              if (team.verified) dispatch(adminState.approveTeamAction(team._id))
             }
           })
         })

@@ -2,7 +2,8 @@ import {
   UPDATE_ROOM_PASSWORD,
   ADD_TEAM,
   DENY_TEAM,
-  APPROVE_TEAM
+  APPROVE_TEAM,
+  CLEAR_TEAMS
 } from './types'
 
 export function updateRoomPasswordAction(password) {
@@ -30,5 +31,11 @@ export function addTeamAction(team) {
   return {
     type: ADD_TEAM,
     payload: team
+  }
+}
+
+export function clearTeamsAction() {
+  return {
+    type: CLEAR_TEAMS
   }
 }
