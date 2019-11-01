@@ -56,7 +56,8 @@ export default function recoverStateAction() {
               dispatch(appState.updateStatusAction('loading'))
               dispatch(appState.updateLoadingMessageAction('Waiting for quizmaster to verify team...'))
             } else if (parsed.team.verified) {
-              history.replace('/quiz')
+              dispatch(appState.updateStatusAction('loading'))
+              dispatch(appState.updateLoadingMessageAction('Waiting for the round to start...'))
               // Team name is verified, team is in the game
             }
           }

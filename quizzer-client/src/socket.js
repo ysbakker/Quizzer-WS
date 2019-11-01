@@ -50,8 +50,15 @@ const attachSocketListeners = (socket, dispatch) => {
 
     switch (msg.mType) {
       case 'name_approved':
+        dispatch(fetchState.updateFetchingAction(false))
+        dispatch(fetchState.updateFetchingResultAction(null))
+        dispatch(fetchState.updateFetchingResultAction('success'))
+        dispatch(fetchState.updateFetchingMessageAction('Your team name was approved'))
+        dispatch(appState.updateStatusAction('loading'))
+        dispatch(appState.updateLoadingMessageAction('Waiting for the round to start...'))
         break;
       case 'name_denied':
+        dispatch(fetchState.updateFetchingAction(false))
         dispatch(fetchState.updateFetchingResultAction(null))
         dispatch(fetchState.updateFetchingResultAction('error'))
         dispatch(fetchState.updateFetchingMessageAction('Your team name was denied'))
