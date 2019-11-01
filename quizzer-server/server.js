@@ -1,14 +1,11 @@
 const http = require('http')
 const cors = require('cors')
-const ws = require('ws')
 const express = require('express')
 const bodyParser = require('body-parser')
 const mongoose = require('mongoose')
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session)
-
-const middleware = require('./routes/middleware')
-const models = require('./models/index')
+const wss = require('./socket')
 
 const app = express();
 const server = http.createServer();
@@ -22,13 +19,9 @@ const sessionParser = session({
   })
 })
 
-/************************
- * Socket Server Config *
- ************************/
-
-const wss = new ws.Server({
-  noServer: true
-});
+/*********************************
+ * Upgrade to WebSocket Protocol *
+ *********************************/
 
 server.on("upgrade", (request, socket, head) => {
   sessionParser(request, {}, () => {
@@ -47,29 +40,10 @@ server.on("upgrade", (request, socket, head) => {
   })
 })
 
-// Handle new socket connection, this means HTTP upgrade was OK
-wss.on("connection", (socket, req) => {
-  const { session } = req
-  socket.role = session.role
-  socket.room = session.room
-  socket.teamid = session.teamid
-  attachListeners(socket, wss, session)
-})
-
 server.on('request', app);
 server.listen(3000, () => {
   console.log("The Server is lisening on port 3000.")
 });
-
-const attachListeners = (socket, server, session) => {
-  socket.on('message', message => {
-
-  })
-
-  socket.on('close', () => {
-
-  })
-}
 
 /*******************
  * REST API Config *

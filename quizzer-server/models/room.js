@@ -24,6 +24,10 @@ const roomSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Team'
   }],
+  currentRound: {
+    type: Number,
+    default: 0
+  },
   rounds: {
     type: [round.schema]
   }

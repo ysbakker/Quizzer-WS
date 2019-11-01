@@ -48,9 +48,9 @@ const checkIfUserIsInRoom = async (req, res, next) => {
   const { model } = models.room
   const { room } = req.session
 
-  const r = await model.findOne({ number: roomid })
+  const r = roomid ? await model.findOne({ number: roomid }) : await model.findById(room)
 
-  if (r._id.toString() !== room.toString()) {
+  if (!r || r._id.toString() !== room.toString()) {
     const e = new Error('You don\'t have access to this room!')
     e.rescode = 403
     return next(e)
