@@ -7,20 +7,16 @@ import LandingForm from '../components/landingform'
 
 import Logo from '../components/logo'
 import LoadingSpinner from '../components/loadingspinner'
-import TopPanel from '../components/toppanel'
-import InfoPanel from '../components/infopanel';
 import ListView from '../components/listview'
 import ApproveItem from '../components/approveitem'
 
 import * as appStateActions from '../actions/appStateActions'
 import * as adminStateActions from '../actions/adminStateActions'
-import * as fetchStateActions from '../actions/fetchStateActions'
 
 import createRoomAction from '../actions/async/createRoomAction'
 import verifyTeamAction from '../actions/async/verifyTeamAction'
-import fetchTeamsAction from '../actions/async/fetchTeamsAction'
-import TeamsPanel from '../components/teamspanel';
-import ActionButton from '../components/actionbutton';
+import startRoundAction from '../actions/async/startRoundAction'
+import AdminView from './adminview';
 
 /************************
  ** AdminApp Component **
@@ -114,36 +110,38 @@ class AdminApp extends React.Component {
         </Landing>
       </Route>
       <Route exact path="/quizmaster/verifyteams">
-        <div className="admin-container">
-          <div className="admin-left">
-            <TopPanel
-              roomid={appState.currentRoomNumber}
-              roomname={appState.currentRoomName}
-            />
-            <ListView
-              title='Approve teams'
-              items={adminState.pendingTeams.map(team => { return { id: team._id, text: team.name } })}
-              ListItemComponent={attributes => <ApproveItem
-                {...attributes}
-                acceptTeamHandler={(id) => props.verifyTeam(id, true)}
-                denyTeamHandler={(id) => props.verifyTeam(id, false)}
-              />}
-            />
-          </div>
-          <div className="admin-right">
-            <InfoPanel
-              roomname={appState.currentRoomName}
-            />
-            <TeamsPanel
-              teams={adminState.approvedTeams}
-            />
-            <ActionButton
-              buttons={[
-                { text: `Start round ${quizState.round + 1}` }
-              ]}
-            />
-          </div>
-        </div>
+        <AdminView
+          buttons={[
+            { text: `Start round ${quizState.round + 1}`, clickHandler: props.startRound }
+          ]}
+        >
+          <ListView
+            title='Approve teams'
+            items={adminState.pendingTeams.map(team => { return { id: team._id, text: team.name } })}
+            ListItemComponent={attributes => <ApproveItem
+              {...attributes}
+              acceptTeamHandler={(id) => props.verifyTeam(id, true)}
+              denyTeamHandler={(id) => props.verifyTeam(id, false)}
+            />}
+          />
+        </AdminView>
+      </Route>
+      <Route exact path="/quizmaster/pickcategories">
+        <AdminView
+          buttons={[
+            { text: `Pick Question 1`, clickHandler: () => console.log('hi') }
+          ]}
+        >
+          <ListView
+            title='Pick 3 categories'
+            items={[{ id: 1, text: 'hi' }]}
+            ListItemComponent={attributes => <ApproveItem
+              {...attributes}
+              acceptTeamHandler={(id) => console.log('hi')}
+              denyTeamHandler={(id) => console.log('hi')}
+            />}
+          />
+        </AdminView>
       </Route>
 
       <Route exact path="/quizmaster" render={() => {
@@ -168,9 +166,7 @@ function mapDispatchToProps(dispatch) {
     updateRoomPassword: password => dispatch(adminStateActions.updateRoomPasswordAction(password)),
     createRoom: password => dispatch(createRoomAction(password)),
     verifyTeam: (teamid, accepted) => dispatch(verifyTeamAction(teamid, accepted)),
-    fetchTeams: () => dispatch(fetchTeamsAction()),
-    updateFetchingMessage: message => dispatch(fetchStateActions.updateFetchingMessageAction(message)),
-    updateFetchingResult: result => dispatch(fetchStateActions.updateFetchingResultAction(result))
+    startRound: () => dispatch(startRoundAction())
   }
 }
 

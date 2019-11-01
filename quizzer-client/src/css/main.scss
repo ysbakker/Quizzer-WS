@@ -51,6 +51,7 @@ body {
   font-weight: bold;
   box-shadow: 0 2px 5px $charcoal;
   transition: top .2s;
+  white-space: nowrap;
 
   p {
     color: $titanium
@@ -65,6 +66,7 @@ body {
   }
 
   &.show {
+    white-space: normal;
     top: 0;
     transition: top .2s;
   }
@@ -259,7 +261,7 @@ a.bare-link {
         list-style-type: none;
         li {
           margin-top: .2em;
-          font-size: 1.1em;
+          font-size: 1em;
           font-weight: bold;
         }
         li:nth-child(odd) {

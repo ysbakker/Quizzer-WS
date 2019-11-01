@@ -1,6 +1,7 @@
 import * as fetchState from '../fetchStateActions'
 import * as adminState from '../adminStateActions'
 import * as appState from '../appStateActions'
+import * as quizState from '../quizStateActions'
 
 import fetchTeams from './fetchTeamsAction'
 
@@ -43,8 +44,13 @@ export default function recoverStateAction() {
           window.socket = createConnectedSocket(dispatch)
 
           if (parsed.role === 'quizmaster') {
-            history.replace('/quizmaster/verifyteams')
+            if (parsed.currentRound === 0) {
+              history.replace('/quizmaster/verifyteams')
+            } else {
+              history.replace('/quizmaster/pickcategories')
+            }
             dispatch(adminState.updateRoomPasswordAction(parsed.password))
+            dispatch(quizState.setRoundAction(parsed.currentRound))
             dispatch(fetchTeams())
           } else {
             dispatch(appState.updateTeamIdAction(parsed.team._id))
@@ -57,8 +63,6 @@ export default function recoverStateAction() {
               dispatch(appState.updateLoadingMessageAction('Waiting for quizmaster to verify team...'))
             } else if (parsed.team.verified) {
               dispatch(appState.updateStatusAction('loading'))
-              dispatch(appState.updateLoadingMessageAction('Waiting for the round to start...'))
-              // Team name is verified, team is in the game
             }
           }
         })

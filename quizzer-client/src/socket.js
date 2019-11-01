@@ -67,6 +67,9 @@ const attachSocketListeners = (socket, dispatch) => {
       case 'new_team':
         dispatch(fetchTeams())
         break;
+      case 'start_round':
+        dispatch(appState.updateLoadingMessageAction('Quizmaster is picking categories...'))
+        break;
       default:
         console.log('Message with unknown mType received:', msg)
         break
