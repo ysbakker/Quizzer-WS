@@ -2,14 +2,12 @@ import * as fetchState from '../fetchStateActions'
 import * as adminState from '../adminStateActions'
 
 import * as GLOBALS from '../../globals'
-import verifyTeamAction from './verifyTeamAction'
 
 export default function fetchTeamsAction() {
   return (dispatch, getState) => {
     dispatch(fetchState.updateFetchingAction(true))
 
     const { currentRoomNumber } = getState().appState
-    const { pendingTeams } = getState().adminState
 
     fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/teams/`, {
       method: 'GET',

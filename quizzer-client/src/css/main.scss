@@ -281,16 +281,27 @@ ul.list-container {
     color: $titanium;
   }
 
-  li {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+  .list-view-item {
     width: 100%;
     margin: .5em 0 0 0;
     padding: .5em .7em;
     background: $dunes;
     list-style-type: none;
     border-radius: 5px;
+
+    &.item-approve {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    &.item-select {
+      cursor: pointer;
+
+      &.selected {
+        background: $correct
+      }
+    }
 
     p {
       color: $charcoal;

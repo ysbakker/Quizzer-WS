@@ -1,8 +1,4 @@
 module.exports = {
-  category: {
-    schema: require('./category').schema,
-    model: require('./category').model
-  },
   question: {
     schema: require('./question').schema,
     model: require('./question').model

@@ -4,6 +4,7 @@ import * as appState from '../appStateActions'
 import * as quizState from '../quizStateActions'
 
 import fetchTeams from './fetchTeamsAction'
+import fetchCategories from './fetchCategoriesAction'
 
 import * as GLOBALS from '../../globals'
 import { createConnectedSocket } from '../../socket'
@@ -52,6 +53,7 @@ export default function recoverStateAction() {
             dispatch(adminState.updateRoomPasswordAction(parsed.password))
             dispatch(quizState.setRoundAction(parsed.currentRound))
             dispatch(fetchTeams())
+            dispatch(fetchCategories())
           } else {
             dispatch(appState.updateTeamIdAction(parsed.team._id))
             if (parsed.team.name === undefined) {

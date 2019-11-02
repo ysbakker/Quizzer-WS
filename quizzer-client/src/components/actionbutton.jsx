@@ -10,6 +10,7 @@ export default function ActionButton(props) {
   return <div className="action-buttons">
     {buttons.map(button => (
       <button
+        key={button.text}
         onClick={() => button.clickHandler()}
       >
         {button.text}

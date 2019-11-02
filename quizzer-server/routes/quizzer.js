@@ -216,19 +216,29 @@ router.get('/rooms/:roomid/teams', middleware.checkIfRoomExists, async (req, res
 })
 
 router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, async (req, res, next) => {
-  const { room, round } = models
+  const { room } = models
   const { roomid } = req.params
 
   const r = await room.model.findOne({
     number: roomid
   })
 
+  const currentRound = r.rounds.find(round => round.roundNumber === r.currentRound)
+  if (currentRound !== undefined && currentRound.questions.length < 12) {
+    // This means the round hasn't completed yet, so the quizmaster
+    // shouldn't be able to start a new one
+
+    const e = new Error(`Can't start a new round if the previous one hasn't finished yet!`)
+    e.rescode = 403 /* not sure about the response code */
+    return next(e)
+  }
+
   const newRound = {
     roundNumber: r.currentRound + 1
   }
 
   r.rounds.push(newRound)
-  r.currentRound++
+  r.currentRound = newRound.roundNumber
 
   try {
     await r.save()
@@ -243,11 +253,26 @@ router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, async (req, r
   })
 
   wss.clients.forEach(client => {
-    if (client.room.toString() === r._id.toString()) {
+    if (client.role === 'team' && client.room.toString() === r._id.toString()) {
       client.send(JSON.stringify({
         mType: 'start_round'
       }))
     }
+  })
+})
+
+router.get('/categories', async (req, res, next) => {
+  const { question } = models
+
+  const q = await question.model.find()
+
+  const categories = q.reduce((acc, q) => {
+    if (!acc.includes(q.category)) return acc.concat(q.category)
+    else return acc
+  }, [])
+
+  res.json({
+    categories
   })
 })
 

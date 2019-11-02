@@ -28,9 +28,7 @@ const attachSocketListeners = (socket, dispatch) => {
   // const { dispatch } = store
 
   socket.onopen = () => {
-    dispatch(fetchState.updateFetchingResultAction(null))
-    dispatch(fetchState.updateFetchingMessageAction('Socket opened!'))
-    dispatch(fetchState.updateFetchingResultAction('success'))
+    // Notifying on open gets annoying
   }
 
   socket.onerror = event => {

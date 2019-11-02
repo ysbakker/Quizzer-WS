@@ -1,8 +1,33 @@
 import {
   SET_QUESTION,
   SET_ROUND,
-  SET_ANSWER
+  SET_ANSWER,
+  SET_PICKABLE_CATS,
+  ADD_CAT,
+  DEL_CAT
 } from './types'
+
+export const setPickableCategoriesAction = cats => {
+  return {
+    type: SET_PICKABLE_CATS,
+    payload: cats
+  }
+}
+
+export const addCategoryAction = (cat, max) => {
+  return {
+    type: ADD_CAT,
+    payload: cat,
+    max: max
+  }
+}
+
+export const deleteCategoryAction = cat => {
+  return {
+    type: DEL_CAT,
+    payload: cat
+  }
+}
 
 export const setQuestionAction = question => {
   return {
