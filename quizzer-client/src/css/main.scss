@@ -240,6 +240,14 @@ a.bare-link {
 
     .info-panel {
       text-align: center;
+
+      .info-item {
+        font-weight: bold;
+        font-size: 1.3em;
+      }
+      .tomato-highlight {
+        color: $tomato;
+      }
     }
 
     .teams-panel {
@@ -288,6 +296,11 @@ ul.list-container {
     background: $dunes;
     list-style-type: none;
     border-radius: 5px;
+
+    .sub-text {
+      font-weight: normal;
+      font-size: 1em;
+    }
 
     &.item-approve {
       display: flex;

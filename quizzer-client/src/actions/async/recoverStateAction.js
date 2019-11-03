@@ -5,6 +5,7 @@ import * as quizState from '../quizStateActions'
 
 import fetchTeams from './fetchTeamsAction'
 import fetchCategories from './fetchCategoriesAction'
+import fetchQuestionsAction from './fetchQuestionsAction'
 
 import * as GLOBALS from '../../globals'
 import { createConnectedSocket } from '../../socket'
@@ -36,6 +37,7 @@ export default function recoverStateAction() {
           dispatch(fetchState.updateFetchingMessageAction('Welcome back!'))
           dispatch(appState.updateRoomNameAction(parsed.name))
           dispatch(appState.updateRoomNumberAction(parsed.number))
+          dispatch(quizState.setQuestionNrAction(parsed.currentQuestion))
 
           /**
            * Open a socket and store it in 'window'
@@ -47,9 +49,13 @@ export default function recoverStateAction() {
           if (parsed.role === 'quizmaster') {
             if (parsed.currentRound === 0) {
               history.replace('/quizmaster/verifyteams')
-            } else if (parsed.rounds.find(r => r.roundNumber === parsed.currentRound).categories.length === 0) {
+            } else if (parsed.round.categories.length === 0) {
               history.replace('/quizmaster/pickcategories')
             } else {
+              parsed.round.categories.forEach(cat => {
+                dispatch(quizState.addCategoryAction(cat))
+              })
+              dispatch(fetchQuestionsAction())
               history.replace('/quizmaster/pickquestion')
             }
             dispatch(adminState.updateRoomPasswordAction(parsed.password))

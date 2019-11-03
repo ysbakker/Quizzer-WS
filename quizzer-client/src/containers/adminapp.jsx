@@ -18,6 +18,8 @@ import createRoomAction from '../actions/async/createRoomAction'
 import verifyTeamAction from '../actions/async/verifyTeamAction'
 import startRoundAction from '../actions/async/startRoundAction'
 import setCategoriesAction from '../actions/async/setCategoriesAction';
+import setQuestionAction from '../actions/async/setQuestionAction';
+import fetchQuestionsAction from '../actions/async/fetchQuestionsAction';
 import AdminView from './adminview';
 import SelectItem from '../components/selectitem';
 
@@ -154,17 +156,15 @@ class AdminApp extends React.Component {
       <Route exact path="/quizmaster/pickquestion">
         <AdminView
           buttons={[
-            { text: `Open Question ${quizState.questionNr}`, clickHandler: () => props.setCategories(quizState.roundCategories) }
+            { text: `Open Question ${quizState.questionNr + 1}`, clickHandler: () => props.setQuestionAsync(quizState.question) }
           ]}
         >
           <SelectListView
             title={`Pick a question`}
-            items={[]}
-            selectedIds={[]}
+            items={quizState.pickableQuestions.map(q => ({ id: q._id, text: q.question.replace('`', '\''), sub: { Category: q.category, Answer: q.answer } }))}
+            selectedIds={quizState.question ? quizState.question.split() : null}
             handlers={{
-              onSelectHandler: (cat) => {
-                if (quizState.roundCategories.length < 3) props.addCategory(cat)
-              },
+              onSelectHandler: (q) => props.setQuestion(q),
               onDeselectHandler: (q) => null // do nothing
             }}
           />
@@ -196,7 +196,10 @@ function mapDispatchToProps(dispatch) {
     startRound: () => dispatch(startRoundAction()),
     addCategory: cat => dispatch(quizStateActions.addCategoryAction(cat)),
     deleteCategory: cat => dispatch(quizStateActions.deleteCategoryAction(cat)),
-    setCategories: cats => dispatch(setCategoriesAction(cats))
+    setCategories: cats => dispatch(setCategoriesAction(cats)),
+    fetchQuestions: amt => dispatch(fetchQuestionsAction(amt)),
+    setQuestion: q => dispatch(quizStateActions.setQuestionAction(q)),
+    setQuestionAsync: q => dispatch(setQuestionAction(q))
   }
 }
 

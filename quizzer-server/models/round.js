@@ -5,29 +5,31 @@ const roundSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  open: {
+    type: Boolean,
+    default: true
+  },
   categories: [String],
-  questions: [{
-    questionNumber: {
-      type: Number,
-      required: true
+  question: {
+    id: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Question'
     },
-    question: {
-      data: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Question'
+    open: Boolean,
+    questionNumber: {
+      type: Number
+    },
+    answers: [{
+      answer: {
+        type: String,
+        required: true
       },
-      answers: [{
-        answer: {
-          type: String,
-          required: true
-        },
-        team: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: 'Team'
-        }
-      }]
-    }
-  }]
+      team: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Team'
+      }
+    }]
+  }
 })
 
 module.exports = {

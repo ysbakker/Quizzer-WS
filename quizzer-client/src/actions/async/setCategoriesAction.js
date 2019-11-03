@@ -3,6 +3,7 @@ import * as fetchState from '../fetchStateActions'
 import { history } from '../../containers/quizzer'
 
 import * as GLOBALS from '../../globals'
+import fetchQuestionsAction from './fetchQuestionsAction'
 
 export default function setCategoriesAction(cats) {
   return (dispatch, getState) => {
@@ -10,7 +11,7 @@ export default function setCategoriesAction(cats) {
 
     const { currentRoomNumber } = getState().appState
 
-    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/rounds/current`, {
+    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/round`, {
       method: 'PATCH',
       cache: 'no-cache',
       credentials: 'include',
@@ -27,6 +28,7 @@ export default function setCategoriesAction(cats) {
         .then(parsed => {
           if (!res.ok) throw parsed
           dispatch(fetchState.updateFetchingAction(false))
+          dispatch(fetchQuestionsAction())
           history.push('/quizmaster/pickquestion')
         })
         .catch(parsed => {

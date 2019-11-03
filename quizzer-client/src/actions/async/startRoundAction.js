@@ -15,8 +15,8 @@ export default function startRoundAction() {
     const { currentRoomNumber } = getState().appState
     const { round } = getState().quizState
 
-    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/rounds`, {
-      method: 'POST',
+    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/round`, {
+      method: 'PUT',
       cache: 'no-cache',
       credentials: 'include',
       mode: 'cors',
@@ -32,6 +32,7 @@ export default function startRoundAction() {
           dispatch(fetchState.updateFetchingResultAction('success'))
           dispatch(fetchState.updateFetchingMessageAction(parsed.success))
           dispatch(quizState.setRoundAction(round + 1))
+          dispatch(quizState.setQuestionNrAction(0))
 
           dispatch(fetchCategories())
           history.push('/quizmaster/pickcategories')

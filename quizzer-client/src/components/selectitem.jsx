@@ -8,7 +8,9 @@ export default function SelectItem(props) {
       if (selected) handlers.onDeselectHandler(item.id)
       else handlers.onSelectHandler(item.id)
     }}
-    className={`list-view-item item-select${selected ? ' selected' : ''}`}>
+    className={`list-view-item item-select${selected ? ' selected' : ''}`}
+  >
     <p>{item.text}</p>
-  </li>
+    {item.sub ? Object.keys(item.sub).map(prop => <p key={prop} className="sub-text"><strong>{prop}</strong> {item.sub[prop]}</p>) : null}
+  </li >
 } 

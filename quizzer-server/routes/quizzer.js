@@ -233,7 +233,7 @@ router.get('/rooms/:roomid/teams', middleware.checkIfRoomExists, middleware.chec
   })
 })
 
-router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+router.put('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { room } = models
   const { roomid } = req.params
 
@@ -241,8 +241,14 @@ router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, middleware.ch
     number: roomid
   })
 
-  const currentRound = r.rounds.find(round => round.roundNumber === r.currentRound)
-  if (currentRound !== undefined && currentRound.questions.length < 12) {
+  if (r.round === undefined || (r.currentRound !== r.round.roundNumber && !r.round.open)) {
+    const newRound = {
+      roundNumber: r.currentRound + 1
+    }
+
+    r.round = newRound
+    r.currentRound = newRound.roundNumber
+  } else {
     // This means the round hasn't completed yet, so the quizmaster
     // shouldn't be able to start a new one
 
@@ -250,13 +256,6 @@ router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, middleware.ch
     e.rescode = 403 /* not sure about the response code */
     return next(e)
   }
-
-  const newRound = {
-    roundNumber: r.currentRound + 1
-  }
-
-  r.rounds.push(newRound)
-  r.currentRound = newRound.roundNumber
 
   try {
     await r.save()
@@ -279,24 +278,16 @@ router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, middleware.ch
   })
 })
 
-router.patch('/rooms/:roomid/rounds/current', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
-  const { room } = models
-  const { categories } = req.body
+router.patch('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+  const { room, question } = models
+  const { categories, questionId } = req.body
   const { roomid } = req.params
 
-  if (categories === undefined) {
+  const operations = [{ operation: 'categories', val: categories }, { operation: 'question', val: questionId }]
+  // Allowed PATCH operations
+  if (operations.every(i => i.val === undefined)) {
     const e = new Error('Invalid PATCH operation!')
-    e.rescode = 400
-    return next(e)
-  }
-
-  const response = await fetch('http://localhost:3000/quizzer/categories')
-  const json = await response.json()
-  const allowedCategories = json.categories
-
-  if (allowedCategories === undefined || !categories.every(cat => allowedCategories.includes(cat)) || categories.length > 3) {
-    const e = new Error('Invalid categories!')
-    e.rescode = 400
+    e.rescode = 403
     return next(e)
   }
 
@@ -304,14 +295,43 @@ router.patch('/rooms/:roomid/rounds/current', middleware.checkIfRoomExists, midd
     number: roomid
   })
 
-  const currentRound = r.rounds.find(round => round.roundNumber === r.currentRound)
-  if (currentRound === undefined) {
+  if (r.round === undefined || r.round.roundNumber !== r.currentRound) {
     const e = new Error('Round not initialized!')
     e.rescode = 404
     return next(e)
   }
 
-  currentRound.categories = categories
+  for (op of operations) {
+    if (op.val !== undefined) {
+      if (op.operation === 'categories') {
+        const response = await fetch('http://localhost:3000/quizzer/categories')
+        const json = await response.json()
+        const allowedCategories = json.categories
+        if (allowedCategories === undefined || !categories.every(cat => allowedCategories.includes(cat)) || categories.length > 3) {
+          const e = new Error('Invalid categories!')
+          e.rescode = 400
+          return next(e)
+        }
+        r.round.categories = categories
+      } else if (op.operation === 'question') {
+        const q = await question.model.findById(questionId)
+        if (q === undefined || !r.round.categories.includes(q.category)) {
+          const e = new Error('Invalid question for this round!')
+          e.rescode = 400
+          return next(e)
+        }
+        if (r.round.question === undefined || (r.round.question.questionNumber !== r.currentQuestion && !r.round.question.open)) {
+          r.round.question.id = q._id
+          r.round.question.open = true
+          r.currentQuestion++
+        } else {
+          const e = new Error('Question is not closed yet!')
+          e.rescode = 403
+          return next(e)
+        }
+      }
+    }
+  }
 
   try {
     await r.save()
@@ -322,7 +342,39 @@ router.patch('/rooms/:roomid/rounds/current', middleware.checkIfRoomExists, midd
   }
 
   res.json({
-    success: "Set categories succesfully!"
+    success: "Changed values succesfully!"
+  })
+})
+
+router.get('/questions/random', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+  const { room, question } = models
+  const count = req.query.count ? parseInt(req.query.count) : 10
+
+  const r = await room.model.findById(req.session.room)
+
+  const cats = r.round.categories
+
+  if (!cats || cats.length === 0) {
+    const e = new Error(`Categories not set yet!`)
+    e.rescode = 403
+    return next(e)
+  }
+
+  let questions = await question.model.find()
+  // filter out questions with wrong categories
+  questions = questions.filter(q => cats.includes(q.category))
+
+  let selectedQuestions = []
+  while (selectedQuestions.length < count) {
+    const r = Math.floor(Math.random() * questions.length)
+
+    if ((!r.usedQuestions || !r.usedQuestions.includes(questions[r]._id)) && !selectedQuestions.find(q => q._id === questions[r]._id)) {
+      selectedQuestions.push(questions[r])
+    }
+  }
+
+  res.json({
+    questions: selectedQuestions
   })
 })
 

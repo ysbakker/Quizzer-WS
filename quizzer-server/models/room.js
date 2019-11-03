@@ -24,12 +24,22 @@ const roomSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Team'
   }],
+  usedQuestions: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Question'
+  }],
   currentRound: {
     type: Number,
-    default: 0
+    default: 0,
+    required: true
   },
-  rounds: {
-    type: [round.schema]
+  currentQuestion: {
+    type: Number,
+    default: 0,
+    required: true
+  },
+  round: {
+    type: round.schema
   }
 })
 

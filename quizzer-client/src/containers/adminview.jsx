@@ -12,18 +12,20 @@ import ActionButton from '../components/actionbutton'
  * It receives the currently rendered list view and active buttons.
  */
 function AdminView(props) {
-  const { adminState, appState, buttons, children } = props
+  const { adminState, appState, quizState, buttons, children } = props
   return <div className="admin-container">
     <div className="admin-left">
       <TopPanel
         roomid={appState.currentRoomNumber}
-        roomname={appState.currentRoomName}
+        categories={quizState.roundCategories}
       />
       {children}
     </div>
     <div className="admin-right">
       <InfoPanel
         roomname={appState.currentRoomName}
+        round={quizState.round}
+        question={quizState.questionNr}
       />
       <TeamsPanel
         teams={adminState.approvedTeams}
