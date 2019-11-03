@@ -5,6 +5,7 @@ const roundSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
+  categories: [String],
   questions: [{
     questionNumber: {
       type: Number,

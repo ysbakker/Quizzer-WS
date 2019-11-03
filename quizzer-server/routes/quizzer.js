@@ -1,4 +1,6 @@
 const router = require('express').Router()
+const fetch = require('node-fetch')
+
 const models = require('../models/index')
 const middleware = require('./middleware')
 
@@ -84,6 +86,22 @@ router.post('/rooms/:roomid/teams', middleware.checkIfRoomExists, async (req, re
     success: 'Joined room succesfully',
     roomname: matchingRoom.name,
     teamid: newTeam._id
+  })
+})
+
+
+router.get('/categories', async (req, res, next) => {
+  const { question } = models
+
+  const q = await question.model.find()
+
+  const categories = q.reduce((acc, q) => {
+    if (!acc.includes(q.category)) return acc.concat(q.category)
+    else return acc
+  }, [])
+
+  res.json({
+    categories
   })
 })
 
@@ -202,7 +220,7 @@ router.patch('/rooms/:roomid/teams/:teamid', middleware.checkIfRoomExists, middl
  */
 router.use(middleware.checkIfUserIsQuizmaster)
 
-router.get('/rooms/:roomid/teams', middleware.checkIfRoomExists, async (req, res, next) => {
+router.get('/rooms/:roomid/teams', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { model } = models.room
   const { roomid } = req.params
 
@@ -215,7 +233,7 @@ router.get('/rooms/:roomid/teams', middleware.checkIfRoomExists, async (req, res
   })
 })
 
-router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, async (req, res, next) => {
+router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { room } = models
   const { roomid } = req.params
 
@@ -261,18 +279,50 @@ router.post('/rooms/:roomid/rounds', middleware.checkIfRoomExists, async (req, r
   })
 })
 
-router.get('/categories', async (req, res, next) => {
-  const { question } = models
+router.patch('/rooms/:roomid/rounds/current', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+  const { room } = models
+  const { categories } = req.body
+  const { roomid } = req.params
 
-  const q = await question.model.find()
+  if (categories === undefined) {
+    const e = new Error('Invalid PATCH operation!')
+    e.rescode = 400
+    return next(e)
+  }
 
-  const categories = q.reduce((acc, q) => {
-    if (!acc.includes(q.category)) return acc.concat(q.category)
-    else return acc
-  }, [])
+  const response = await fetch('http://localhost:3000/quizzer/categories')
+  const json = await response.json()
+  const allowedCategories = json.categories
+
+  if (allowedCategories === undefined || !categories.every(cat => allowedCategories.includes(cat)) || categories.length > 3) {
+    const e = new Error('Invalid categories!')
+    e.rescode = 400
+    return next(e)
+  }
+
+  const r = await room.model.findOne({
+    number: roomid
+  })
+
+  const currentRound = r.rounds.find(round => round.roundNumber === r.currentRound)
+  if (currentRound === undefined) {
+    const e = new Error('Round not initialized!')
+    e.rescode = 404
+    return next(e)
+  }
+
+  currentRound.categories = categories
+
+  try {
+    await r.save()
+  } catch (err) {
+    const e = new Error(`Couldn't save room: ${err.message}`)
+    e.rescode = 500
+    return next(e)
+  }
 
   res.json({
-    categories
+    success: "Set categories succesfully!"
   })
 })
 
