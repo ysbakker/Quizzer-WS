@@ -47,8 +47,10 @@ export default function recoverStateAction() {
           if (parsed.role === 'quizmaster') {
             if (parsed.currentRound === 0) {
               history.replace('/quizmaster/verifyteams')
-            } else {
+            } else if (parsed.rounds.find(r => r.roundNumber === parsed.currentRound).categories.length === 0) {
               history.replace('/quizmaster/pickcategories')
+            } else {
+              history.replace('/quizmaster/pickquestion')
             }
             dispatch(adminState.updateRoomPasswordAction(parsed.password))
             dispatch(quizState.setRoundAction(parsed.currentRound))

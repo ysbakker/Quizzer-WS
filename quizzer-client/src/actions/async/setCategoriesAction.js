@@ -1,28 +1,33 @@
 import * as fetchState from '../fetchStateActions'
-import * as quizState from '../quizStateActions'
+
+import { history } from '../../containers/quizzer'
 
 import * as GLOBALS from '../../globals'
 
-export default function fetchCategoriesAction() {
-  return dispatch => {
+export default function setCategoriesAction(cats) {
+  return (dispatch, getState) => {
     dispatch(fetchState.updateFetchingAction(true))
 
-    fetch(`${GLOBALS.API_URL}/categories`, {
-      method: 'GET',
+    const { currentRoomNumber } = getState().appState
+
+    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/rounds/current`, {
+      method: 'PATCH',
       cache: 'no-cache',
       credentials: 'include',
       mode: 'cors',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json'
-      }
+      },
+      body: JSON.stringify({
+        categories: cats
+      })
     })
       .then(res => res.json()
         .then(parsed => {
           if (!res.ok) throw parsed
           dispatch(fetchState.updateFetchingAction(false))
-
-          dispatch(quizState.setPickableCategoriesAction(parsed.categories))
+          history.push('/quizmaster/pickquestion')
         })
         .catch(parsed => {
           const { error } = parsed

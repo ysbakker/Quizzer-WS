@@ -17,6 +17,7 @@ import * as quizStateActions from '../actions/quizStateActions'
 import createRoomAction from '../actions/async/createRoomAction'
 import verifyTeamAction from '../actions/async/verifyTeamAction'
 import startRoundAction from '../actions/async/startRoundAction'
+import setCategoriesAction from '../actions/async/setCategoriesAction';
 import AdminView from './adminview';
 import SelectItem from '../components/selectitem';
 
@@ -134,11 +135,11 @@ class AdminApp extends React.Component {
       <Route exact path="/quizmaster/pickcategories">
         <AdminView
           buttons={[
-            { text: `Pick Question 1`, clickHandler: () => console.log('hi') }
+            { text: `Pick Question 1`, clickHandler: () => props.setCategories(quizState.roundCategories) }
           ]}
         >
           <SelectListView
-            title={`Pick ${3 - quizState.roundCategories.length} categor${quizState.roundCategories.length === 2 ? 'y' : 'ies'} for round ${quizState.round}`}
+            title={`Pick up to ${3 - quizState.roundCategories.length} more categor${quizState.roundCategories.length === 2 ? 'y' : 'ies'}`}
             items={quizState.allCategories.map(cat => ({ id: cat, text: cat }))}
             selectedIds={quizState.roundCategories}
             handlers={{
@@ -146,6 +147,25 @@ class AdminApp extends React.Component {
                 if (quizState.roundCategories.length < 3) props.addCategory(cat)
               },
               onDeselectHandler: (cat) => props.deleteCategory(cat)
+            }}
+          />
+        </AdminView>
+      </Route>
+      <Route exact path="/quizmaster/pickquestion">
+        <AdminView
+          buttons={[
+            { text: `Open Question ${quizState.questionNr}`, clickHandler: () => props.setCategories(quizState.roundCategories) }
+          ]}
+        >
+          <SelectListView
+            title={`Pick a question`}
+            items={[]}
+            selectedIds={[]}
+            handlers={{
+              onSelectHandler: (cat) => {
+                if (quizState.roundCategories.length < 3) props.addCategory(cat)
+              },
+              onDeselectHandler: (q) => null // do nothing
             }}
           />
         </AdminView>
@@ -175,7 +195,8 @@ function mapDispatchToProps(dispatch) {
     verifyTeam: (teamid, accepted) => dispatch(verifyTeamAction(teamid, accepted)),
     startRound: () => dispatch(startRoundAction()),
     addCategory: cat => dispatch(quizStateActions.addCategoryAction(cat)),
-    deleteCategory: cat => dispatch(quizStateActions.deleteCategoryAction(cat))
+    deleteCategory: cat => dispatch(quizStateActions.deleteCategoryAction(cat)),
+    setCategories: cats => dispatch(setCategoriesAction(cats))
   }
 }
 
