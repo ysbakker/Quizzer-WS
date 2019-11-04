@@ -22,4 +22,4 @@ export const SET_PICKABLE_QUESTIONS = 'Set questions the quizmaster can choose f
 export const SET_QUESTION = 'Set current question (id / text)'
 export const SET_QUESTION_NR = 'Set current question no.'
 export const SET_ROUND = 'Set current round number'
-export const SET_ANSWER = 'Set current question\'s answer'
+export const SET_ANSWER = 'Set team\'s answer to current question'

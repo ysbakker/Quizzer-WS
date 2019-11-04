@@ -27,7 +27,7 @@ export default class LandingForm extends React.Component {
     const { props, state } = this
     const { fieldType, fieldName, fieldPlaceholder, fieldMaxLength, label } = props.formData
     return <form className={`landing-form${state.error === true ? ' error' : ''}`}>
-      <label htmlFor={fieldName}>{label}</label>
+      <label className="form-label" htmlFor={fieldName}>{label}</label>
       <input
         type={fieldType}
         id={fieldName}

@@ -5,6 +5,8 @@ import * as appState from './actions/appStateActions'
 
 import fetchTeams from './actions/async/fetchTeamsAction'
 
+import { history } from './containers/quizzer'
+
 /********************
  ** WebSocket conf **
  ********************/
@@ -47,6 +49,10 @@ const attachSocketListeners = (socket, dispatch) => {
     const msg = JSON.parse(event.data)
 
     switch (msg.mType) {
+      case 'set_categories':
+        dispatch(appState.updateStatusAction('loading'))
+        dispatch(appState.updateLoadingMessageAction('Waiting for the first question to start...'))
+        break;
       case 'name_approved':
         dispatch(fetchState.updateFetchingAction(false))
         dispatch(fetchState.updateFetchingResultAction(null))
@@ -54,6 +60,7 @@ const attachSocketListeners = (socket, dispatch) => {
         dispatch(fetchState.updateFetchingMessageAction('Your team name was approved'))
         dispatch(appState.updateStatusAction('loading'))
         dispatch(appState.updateLoadingMessageAction('Waiting for the round to start...'))
+        history.push('/quiz')
         break;
       case 'name_denied':
         dispatch(fetchState.updateFetchingAction(false))
@@ -66,6 +73,7 @@ const attachSocketListeners = (socket, dispatch) => {
         dispatch(fetchTeams())
         break;
       case 'start_round':
+        dispatch(appState.updateStatusAction('loading'))
         dispatch(appState.updateLoadingMessageAction('Quizmaster is picking categories...'))
         break;
       default:

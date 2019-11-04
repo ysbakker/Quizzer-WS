@@ -176,6 +176,46 @@ a.bare-link {
     }
   }
 }
+  ///////////////
+ // Quiz view //
+///////////////
+
+.quizzer-info {
+  p {
+    color: #999;
+    font-size: 1.1em;
+    text-align: center;
+  }
+}
+
+.quizzer-question {
+  margin-top: 1em;
+  h2, .form-label {
+    font-size: 2.5em;
+    font-weight: normal;
+    font-style: normal;
+    color: $tomato;
+    text-transform: uppercase;
+  }
+
+  .landing-form {
+    top: 25px;
+  }
+
+  .category {
+    position: relative;
+    top: -9px;
+    right: -34px;
+    color: darken($tomato,5);
+    text-transform: uppercase;
+    font-size: 1em
+  }
+
+  .question {
+    font-size: 1.5em;
+    font-style: italic;
+  }
+}
 
   ////////////////
  // Admin view //

@@ -35,10 +35,12 @@ export default function recoverStateAction() {
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(fetchState.updateFetchingResultAction('success'))
           dispatch(fetchState.updateFetchingMessageAction('Welcome back!'))
+          dispatch(quizState.setRoundAction(parsed.currentRound))
           dispatch(appState.updateRoomNameAction(parsed.name))
           dispatch(appState.updateRoomNumberAction(parsed.number))
           dispatch(quizState.setQuestionNrAction(parsed.currentQuestion))
-          dispatch(quizState.setQuestionAction(parsed.round.question.questiondata))
+          if (parsed.round.question.questiondata) dispatch(quizState.setQuestionAction(parsed.round.question.questiondata))
+          else dispatch(quizState.setQuestionAction(null))
 
           /**
            * Open a socket and store it in 'window'
@@ -60,7 +62,6 @@ export default function recoverStateAction() {
               history.replace('/quizmaster/pickquestion')
             }
             dispatch(adminState.updateRoomPasswordAction(parsed.password))
-            dispatch(quizState.setRoundAction(parsed.currentRound))
             dispatch(fetchTeams())
             dispatch(fetchCategories())
           } else {
@@ -69,17 +70,18 @@ export default function recoverStateAction() {
               history.replace('/authenticate')
               dispatch(appState.updateStatusAction('enteringTeam'))
             } else if (parsed.team.name !== undefined && !parsed.team.verified) {
-              history.replace('/authenticate')
+              history.replace('/quiz')
               dispatch(appState.updateStatusAction('loading'))
               dispatch(appState.updateLoadingMessageAction('Waiting for quizmaster to verify team...'))
             } else if (parsed.team.verified) {
-              dispatch(appState.updateStatusAction('loading'))
-            } else {
-              dispatch(appState.updateStatusAction('loading'))
+              history.replace('/quiz')
+              if (parsed.round.question && parsed.round.question.open) dispatch(appState.updateStatusAction('quizz'))
+              else dispatch(appState.updateStatusAction('loading'))
             }
           }
         })
-        .catch(() => {
+        .catch(e => {
+          console.log(e)
           // when an error respone happens, it means the client doesn't have
           // a session stored on the server.
           // In this case, the fetch request just gets ignored and the client gets sent to the landing route

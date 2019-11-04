@@ -10,6 +10,8 @@ import LoadingSpinner from '../components/loadingspinner'
 import * as appStateActions from '../actions/appStateActions'
 import authenticateAction from '../actions/async/authenticateAction'
 import renameTeamAction from '../actions/async/renameTeamAction'
+import QuizQuestion from '../components/quizquestion';
+import submitAnswerAction from '../actions/async/submitAnswerAction';
 
 /***********************
  ** TeamApp Component **
@@ -118,6 +120,16 @@ class TeamApp extends React.Component {
           {this.landingViewComponent()}
         </Landing>
       </Route>
+      <Route exact path="/quiz">
+        <QuizQuestion
+          submittedAnswer={props.quizState.answer}
+          submitAnswer={props.submitAnswer}
+          roomname={props.appState.currentRoomName}
+          round={props.quizState.round}
+          questionNr={props.quizState.questionNr}
+          question={props.quizState.question}
+        />
+      </Route>
 
       <Route render={() => {
         // Redirect user to /authenticate
@@ -142,7 +154,8 @@ class TeamApp extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    appState: state.appState
+    appState: state.appState,
+    quizState: state.quizState
   }
 }
 
@@ -151,7 +164,8 @@ function mapDispatchToProps(dispatch) {
     updateRoomNumber: number => dispatch(appStateActions.updateRoomNumberAction(number)),
     updateStatus: status => dispatch(appStateActions.updateStatusAction(status)),
     authenticate: (roomid, password) => dispatch(authenticateAction(roomid, password)),
-    renameTeam: (teamname) => dispatch(renameTeamAction(teamname))
+    renameTeam: teamname => dispatch(renameTeamAction(teamname)),
+    submitAnswer: answer => dispatch(submitAnswerAction(answer))
   }
 }
 
