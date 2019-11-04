@@ -26,7 +26,7 @@ const readFileP = (file) => {
 
 const getAllQuestions = async () => {
   let q;
-  await readFileP(path.join(__dirname, 'questions.json'))
+  await readFileP(path.join(__dirname, 'vragen.json'))
     .then(data => JSON.parse(data))
     .then(parsed => q = parsed)
     .catch(err => console.log(err))

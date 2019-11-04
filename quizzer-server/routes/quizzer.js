@@ -110,7 +110,7 @@ router.get('/categories', async (req, res, next) => {
  */
 router.use(middleware.checkIfUserIsAuthenticated)
 
-router.put('/rooms/:roomid/round/answers', middleware.checkIfUserIsInRoom, async (req, res, next) => {
+router.put('/rooms/:roomid/round/answers', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { room } = models
   const { roomid } = req.params
   const { answer } = req.body
@@ -144,6 +144,14 @@ router.put('/rooms/:roomid/round/answers', middleware.checkIfUserIsInRoom, async
 
   res.json({
     success: "Submitted answer succesfully"
+  })
+
+  wss.clients.forEach(client => {
+    if (client.role === 'quizmaster' && client.room.toString() === r._id.toString()) {
+      client.send(JSON.stringify({
+        mType: 'new_answer'
+      }))
+    }
   })
 })
 
@@ -273,6 +281,22 @@ router.patch('/rooms/:roomid/teams/:teamid', middleware.checkIfRoomExists, middl
  */
 router.use(middleware.checkIfUserIsQuizmaster)
 
+router.get('/rooms/:roomid/round/answers', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+  const { room } = models
+  const { roomid } = req.params
+
+  const r = await room.model.findOne({
+    number: roomid
+  }).populate({
+    path: 'round.question.answers.team',
+    model: 'Team'
+  })
+
+  res.json({
+    answers: r.round.question.answers
+  })
+})
+
 router.get('/rooms/:roomid/teams', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { model } = models.room
   const { roomid } = req.params
@@ -399,7 +423,7 @@ router.patch('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.ch
 
   res.json({
     success: "Changed values succesfully!",
-    question: questionId ? { questionNumber: r.currentQuestion, ...q._doc } : undefined
+    question: questionId ? { questionNumber: r.currentQuestion, open: true, ...q._doc } : undefined
   })
 
   wss.clients.forEach(client => {
