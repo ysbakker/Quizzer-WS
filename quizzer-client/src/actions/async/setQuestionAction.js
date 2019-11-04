@@ -29,8 +29,7 @@ export default function setQuestionAction(q) {
           if (!res.ok) throw parsed
           dispatch(fetchState.updateFetchingAction(false))
           dispatch(quizState.setQuestionAction(parsed.question))
-          dispatch(quizState.setQuestionNrAction(parsed.questionNr))
-          dispatch(quizState.setAnswerAction(parsed.action))
+          dispatch(quizState.setQuestionNrAction(parsed.question.questionNumber))
           // history.push('/quizmaster/verifyquestions')
         })
         .catch(parsed => {

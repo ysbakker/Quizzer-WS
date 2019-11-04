@@ -13,6 +13,10 @@ $dunes: #ddd19f;
   color: $titanium
 }
 
+.tomato-highlight {
+  color: $tomato !important;
+}
+
 input:focus,
 select:focus,
 textarea:focus,
@@ -190,6 +194,7 @@ a.bare-link {
   }
 
   .admin-left {
+    overflow-y: scroll;
     flex: 2;
 
     &>* {
@@ -244,9 +249,6 @@ a.bare-link {
       .info-item {
         font-weight: bold;
         font-size: 1.3em;
-      }
-      .tomato-highlight {
-        color: $tomato;
       }
     }
 

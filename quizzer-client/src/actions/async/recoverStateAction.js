@@ -38,6 +38,7 @@ export default function recoverStateAction() {
           dispatch(appState.updateRoomNameAction(parsed.name))
           dispatch(appState.updateRoomNumberAction(parsed.number))
           dispatch(quizState.setQuestionNrAction(parsed.currentQuestion))
+          dispatch(quizState.setQuestionAction(parsed.round.question.questiondata))
 
           /**
            * Open a socket and store it in 'window'
@@ -72,6 +73,8 @@ export default function recoverStateAction() {
               dispatch(appState.updateStatusAction('loading'))
               dispatch(appState.updateLoadingMessageAction('Waiting for quizmaster to verify team...'))
             } else if (parsed.team.verified) {
+              dispatch(appState.updateStatusAction('loading'))
+            } else {
               dispatch(appState.updateStatusAction('loading'))
             }
           }

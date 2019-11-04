@@ -161,10 +161,10 @@ class AdminApp extends React.Component {
         >
           <SelectListView
             title={`Pick a question`}
-            items={quizState.pickableQuestions.map(q => ({ id: q._id, text: q.question.replace('`', '\''), sub: { Category: q.category, Answer: q.answer } }))}
-            selectedIds={quizState.question ? quizState.question.split() : null}
+            items={quizState.pickableQuestions.map(q => ({ id: q._id, text: q.question.replace(/`/g, '\''), sub: { Category: q.category, Answer: q.answer.replace(/`/g, '\'') } }))}
+            selectedIds={quizState.question ? quizState.question._id.split() : null}
             handlers={{
-              onSelectHandler: (q) => props.setQuestion(q),
+              onSelectHandler: (q) => props.setQuestion({ _id: q }),
               onDeselectHandler: (q) => null // do nothing
             }}
           />

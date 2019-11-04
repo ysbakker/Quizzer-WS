@@ -17,7 +17,7 @@ function AdminView(props) {
     <div className="admin-left">
       <TopPanel
         roomid={appState.currentRoomNumber}
-        categories={quizState.roundCategories}
+        question={quizState.question}
       />
       {children}
     </div>
