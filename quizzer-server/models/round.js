@@ -11,14 +11,11 @@ const roundSchema = new mongoose.Schema({
   },
   categories: [String],
   question: {
-    id: {
+    questiondata: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Question'
     },
     open: Boolean,
-    questionNumber: {
-      type: Number
-    },
     answers: [{
       answer: {
         type: String,

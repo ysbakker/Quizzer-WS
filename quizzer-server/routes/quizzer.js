@@ -110,11 +110,53 @@ router.get('/categories', async (req, res, next) => {
  */
 router.use(middleware.checkIfUserIsAuthenticated)
 
+router.put('/rooms/:roomid/round/answers', middleware.checkIfUserIsInRoom, async (req, res, next) => {
+  const { room } = models
+  const { roomid } = req.params
+  const { answer } = req.body
+
+  const r = await room.model.findOne({
+    number: roomid
+  })
+
+  if (!r.round.question.open) {
+    const e = new Error('Question is closed!')
+    e.rescode = 403
+    return next(e)
+  }
+
+  if (r.round.question.answers.find(a => a.team.toString() === req.session.teamid.toString())) {
+    r.round.question.answers.find(a => a.team.toString() === req.session.teamid.toString()).answer = answer
+  } else {
+    r.round.question.answers.push({
+      answer: answer,
+      team: req.session.teamid
+    })
+  }
+
+  try {
+    await r.save()
+  } catch (err) {
+    const e = new Error(`Couldn't save round in database: ${err.message}`)
+    e.rescode = 500
+    return next(e)
+  }
+
+  res.json({
+    success: "Submitted answer succesfully"
+  })
+})
+
 router.get('/', middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { session } = req
   const { room, team } = models
 
-  const r = await room.model.findById(session.room).populate('teams')
+  const r = await room.model.findById(session.room)
+    .populate('teams')
+    .populate({
+      path: 'round.question.questiondata',
+      model: 'Question'
+    })
   if (r === undefined) {
     const e = new Error('Room not found!')
     e.rescode = 404
@@ -133,9 +175,20 @@ router.get('/', middleware.checkIfUserIsInRoom, async (req, res, next) => {
       role: 'team',
       _id: r._id,
       name: r.name,
-      rounds: r.rounds,
       number: r.number,
-      team: t
+      team: t,
+      currentQuestion: r.currentQuestion,
+      currentRound: r.currentRound,
+      round: {
+        question: r.currentQuestion !== 0 ? {
+          open: r.round.question.open,
+          questiondata: {
+            _id: r.round.question.questiondata._id,
+            question: r.round.question.questiondata.question,
+            category: r.round.question.questiondata.category
+          }
+        } : undefined,
+      }
     })
   }
 })
@@ -320,12 +373,13 @@ router.patch('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.ch
           e.rescode = 400
           return next(e)
         }
-        if (r.round.question === undefined || (r.round.question.questionNumber !== r.currentQuestion && !r.round.question.open)) {
-          r.round.question.id = q._id
+        if (r.round.question === undefined || !r.round.question.open) {
+          r.round.question.questiondata = q._id
           r.round.question.open = true
+          r.usedQuestions.push(q._id)
           r.currentQuestion++
         } else {
-          const e = new Error('Question is not closed yet!')
+          const e = new Error(`Question ${r.currentQuestion} is not closed yet!`)
           e.rescode = 403
           return next(e)
         }
@@ -341,8 +395,23 @@ router.patch('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.ch
     return next(e)
   }
 
+  const q = await question.model.findById(questionId)
+
   res.json({
-    success: "Changed values succesfully!"
+    success: "Changed values succesfully!",
+    question: questionId ? { questionNumber: r.currentQuestion, ...q._doc } : undefined
+  })
+
+  wss.clients.forEach(client => {
+    if (client.role === 'team' && client.room.toString() === r._id.toString()) {
+      if (operations.find(op => op.operation === 'categories').val) client.send(JSON.stringify({
+        mType: 'set_categories',
+        categories: r.round.categories
+      }))
+      else if (operations.find(op => op.operation === 'question').val) client.send(JSON.stringify({
+        mType: 'next_question'
+      }))
+    }
   })
 })
 
