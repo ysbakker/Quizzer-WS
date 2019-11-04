@@ -10,6 +10,7 @@ export const APPROVE_TEAM = 'approve team name'
 export const DENY_TEAM = 'deny team name'
 export const ADD_TEAM = 'add team to pending teams'
 export const CLEAR_TEAMS = 'clear all teams'
+export const SET_ANSWERS = 'set pickable answers'
 
 export const UPDATE_FETCHING = 'update if the application is fetching'
 export const UPDATE_FETCHING_RESULT = 'update the result of the fetch (success/error)'

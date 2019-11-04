@@ -170,6 +170,33 @@ class AdminApp extends React.Component {
           />
         </AdminView>
       </Route>
+      <Route exact path="/quizmaster/verifyanswers">
+        <AdminView
+          buttons={quizState.question && quizState.question.open
+            ? [{ text: `Close Question ${quizState.questionNr}`, clickHandler: () => console.log("ClOSE!") }]
+            : [{ text: `Next Question`, clickHandler: () => console.log("Bruh") }]
+          }
+        >
+          {quizState.question && quizState.question.open ?
+            <SelectListView
+              title={`Waiting for answers...`}
+              items={adminState.teamAnswers.map(a => ({ id: a._id, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
+              selectedIds={[]}
+              handlers={{
+                onSelectHandler: () => null, // do nothing
+                onDeselectHandler: () => null // do nothing
+              }}
+            /> :
+            <ApproveListView
+              title={`Verify Answers`}
+              items={adminState.teamAnswers.map(a => ({ id: a._id, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
+              handlers={{
+                acceptHandler: () => null, // do nothing
+                denyHandler: () => null // do nothing
+              }}
+            />}
+        </AdminView>
+      </Route>
 
       <Route exact path="/quizmaster" render={() => {
         props.history.push(`/quizmaster/create`)

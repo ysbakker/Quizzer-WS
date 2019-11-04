@@ -3,14 +3,16 @@ import {
   APPROVE_TEAM,
   DENY_TEAM,
   ADD_TEAM,
-  CLEAR_TEAMS
+  CLEAR_TEAMS,
+  SET_ANSWERS
 } from '../actions/types'
 
 // Default state
 const initialState = {
   password: null,
   approvedTeams: [],
-  pendingTeams: []
+  pendingTeams: [],
+  teamAnswers: []
 }
 
 export default function adminStateReducer(state = initialState, action) {
@@ -60,6 +62,15 @@ export default function adminStateReducer(state = initialState, action) {
       const changes = {
         pendingTeams: [],
         approvedTeams: []
+      }
+      return {
+        ...state,
+        ...changes
+      }
+    }
+    case SET_ANSWERS: {
+      const changes = {
+        teamAnswers: action.payload
       }
       return {
         ...state,

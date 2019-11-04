@@ -6,11 +6,13 @@ import * as quizState from '../quizStateActions'
 import fetchTeams from './fetchTeamsAction'
 import fetchCategories from './fetchCategoriesAction'
 import fetchQuestionsAction from './fetchQuestionsAction'
+import fetchAnswersAction from './fetchAnswersAction'
 
 import * as GLOBALS from '../../globals'
 import { createConnectedSocket } from '../../socket'
 
 import { history } from '../../containers/quizzer'
+import { parse } from 'path'
 
 export default function recoverStateAction() {
   return dispatch => {
@@ -39,7 +41,7 @@ export default function recoverStateAction() {
           dispatch(appState.updateRoomNameAction(parsed.name))
           dispatch(appState.updateRoomNumberAction(parsed.number))
           dispatch(quizState.setQuestionNrAction(parsed.currentQuestion))
-          if (parsed.round.question.questiondata) dispatch(quizState.setQuestionAction(parsed.round.question.questiondata))
+          if (parsed.round.question.questiondata) dispatch(quizState.setQuestionAction({ ...parsed.round.question.questiondata, open: parsed.round.question.open }))
           else dispatch(quizState.setQuestionAction(null))
 
           /**
@@ -54,6 +56,9 @@ export default function recoverStateAction() {
               history.replace('/quizmaster/verifyteams')
             } else if (parsed.round.categories.length === 0) {
               history.replace('/quizmaster/pickcategories')
+            } else if (parsed.round.question.open) {
+              history.replace('/quizmaster/verifyanswers')
+              dispatch(fetchAnswersAction())
             } else {
               parsed.round.categories.forEach(cat => {
                 dispatch(quizState.addCategoryAction(cat))

@@ -4,8 +4,10 @@ import * as fetchState from './actions/fetchStateActions'
 import * as appState from './actions/appStateActions'
 
 import fetchTeams from './actions/async/fetchTeamsAction'
+import fetchAnswers from './actions/async/fetchAnswersAction'
 
 import { history } from './containers/quizzer'
+import recoverStateAction from './actions/async/recoverStateAction'
 
 /********************
  ** WebSocket conf **
@@ -49,6 +51,10 @@ const attachSocketListeners = (socket, dispatch) => {
     const msg = JSON.parse(event.data)
 
     switch (msg.mType) {
+      case 'start_round':
+        dispatch(appState.updateStatusAction('loading'))
+        dispatch(appState.updateLoadingMessageAction('Quizmaster is picking categories...'))
+        break;
       case 'set_categories':
         dispatch(appState.updateStatusAction('loading'))
         dispatch(appState.updateLoadingMessageAction('Waiting for the first question to start...'))
@@ -69,12 +75,15 @@ const attachSocketListeners = (socket, dispatch) => {
         dispatch(fetchState.updateFetchingMessageAction('Your team name was denied'))
         dispatch(appState.updateStatusAction('enteringTeam'))
         break;
+      case 'next_question':
+        dispatch(appState.updateStatusAction('quizz'))
+        dispatch(recoverStateAction())
+        break;
       case 'new_team':
         dispatch(fetchTeams())
         break;
-      case 'start_round':
-        dispatch(appState.updateStatusAction('loading'))
-        dispatch(appState.updateLoadingMessageAction('Quizmaster is picking categories...'))
+      case 'new_answer':
+        dispatch(fetchAnswers())
         break;
       default:
         console.log('Message with unknown mType received:', msg)
