@@ -22,6 +22,8 @@ import setQuestionAction from '../actions/async/setQuestionAction';
 import fetchQuestionsAction from '../actions/async/fetchQuestionsAction';
 import AdminView from './adminview';
 import SelectItem from '../components/selectitem';
+import closeQuestionAction from '../actions/async/closeQuestionAction';
+import verifyAnswerAction from '../actions/async/verifyAnswerAction';
 
 /************************
  ** AdminApp Component **
@@ -155,32 +157,51 @@ class AdminApp extends React.Component {
       </Route>
       <Route exact path="/quizmaster/pickquestion">
         <AdminView
-          buttons={[
-            { text: `Open Question ${quizState.questionNr + 1}`, clickHandler: () => props.setQuestionAsync(quizState.question) }
-          ]}
+          buttons={quizState.questionNr >= 12
+            ? [{
+              text: `Next Round`, clickHandler: () => {
+                props.startRound()
+                props.quizState.roundCategories.forEach(cat => props.deleteCategory(cat))
+              }
+            }, {
+              text: `Stop Quiz`, clickHandler: () => {
+                props.history.push('/quizmaster/pickcategories')
+              }
+            }]
+            : [
+              { text: `Open Question ${quizState.questionNr + 1}`, clickHandler: () => props.setQuestionAsync(quizState.question) }
+            ]}
         >
-          <SelectListView
-            title={`Pick a question`}
-            items={quizState.pickableQuestions.map(q => ({ id: q._id, text: q.question.replace(/`/g, '\''), sub: { Category: q.category, Answer: q.answer.replace(/`/g, '\'') } }))}
-            selectedIds={quizState.question ? quizState.question._id.split() : null}
-            handlers={{
-              onSelectHandler: (q) => props.setQuestion({ _id: q }),
-              onDeselectHandler: (q) => null // do nothing
-            }}
-          />
+          {quizState.questionNr < 12
+            ? <SelectListView
+              title={`Pick a question`}
+              items={quizState.pickableQuestions.map(q => ({ id: q._id, text: q.question.replace(/`/g, '\''), sub: { Category: q.category, Answer: q.answer.replace(/`/g, '\'') } }))}
+              selectedIds={quizState.question ? quizState.question._id.split() : null}
+              handlers={{
+                onSelectHandler: (q) => props.setQuestion({ _id: q }),
+                onDeselectHandler: (q) => null // do nothing
+              }}
+            />
+            : null
+          }
         </AdminView>
       </Route>
       <Route exact path="/quizmaster/verifyanswers">
         <AdminView
           buttons={quizState.question && quizState.question.open
-            ? [{ text: `Close Question ${quizState.questionNr}`, clickHandler: () => console.log("ClOSE!") }]
-            : [{ text: `Next Question`, clickHandler: () => console.log("Bruh") }]
+            ? [{ text: `Close Question ${quizState.questionNr}`, clickHandler: () => props.closeQuestion() }]
+            : [{
+              text: `Next Question`, clickHandler: () => {
+                props.history.push('/quizmaster/pickquestion')
+                props.fetchQuestions()
+              }
+            }]
           }
         >
           {quizState.question && quizState.question.open ?
             <SelectListView
               title={`Waiting for answers...`}
-              items={adminState.teamAnswers.map(a => ({ id: a._id, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
+              items={adminState.teamAnswers.map(a => ({ id: a.team._id, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
               selectedIds={[]}
               handlers={{
                 onSelectHandler: () => null, // do nothing
@@ -189,10 +210,10 @@ class AdminApp extends React.Component {
             /> :
             <ApproveListView
               title={`Verify Answers`}
-              items={adminState.teamAnswers.map(a => ({ id: a._id, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
+              items={adminState.teamAnswers.map(a => ({ id: a.team._id, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
               handlers={{
-                acceptHandler: () => null, // do nothing
-                denyHandler: () => null // do nothing
+                acceptHandler: (team) => props.verifyAnswer(team, true),
+                denyHandler: (team) => props.verifyAnswer(team, false)
               }}
             />}
         </AdminView>
@@ -226,7 +247,9 @@ function mapDispatchToProps(dispatch) {
     setCategories: cats => dispatch(setCategoriesAction(cats)),
     fetchQuestions: amt => dispatch(fetchQuestionsAction(amt)),
     setQuestion: q => dispatch(quizStateActions.setQuestionAction(q)),
-    setQuestionAsync: q => dispatch(setQuestionAction(q))
+    setQuestionAsync: q => dispatch(setQuestionAction(q)),
+    closeQuestion: () => dispatch(closeQuestionAction()),
+    verifyAnswer: (team, correct) => dispatch(verifyAnswerAction(team, correct))
   }
 }
 

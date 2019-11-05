@@ -12,7 +12,6 @@ import * as GLOBALS from '../../globals'
 import { createConnectedSocket } from '../../socket'
 
 import { history } from '../../containers/quizzer'
-import { parse } from 'path'
 
 export default function recoverStateAction() {
   return dispatch => {
@@ -35,7 +34,7 @@ export default function recoverStateAction() {
           dispatch(appState.updateRoomNameAction(parsed.name))
           dispatch(appState.updateRoomNumberAction(parsed.number))
           dispatch(quizState.setQuestionNrAction(parsed.currentQuestion))
-          if (parsed.round.question.questiondata) dispatch(quizState.setQuestionAction({ ...parsed.round.question.questiondata, open: parsed.round.question.open }))
+          if (parsed.round && parsed.round.question.questiondata) dispatch(quizState.setQuestionAction({ ...parsed.round.question.questiondata, open: parsed.round.question.open }))
           else dispatch(quizState.setQuestionAction(null))
 
           /**
@@ -50,7 +49,7 @@ export default function recoverStateAction() {
               history.replace('/quizmaster/verifyteams')
             } else if (parsed.round.categories.length === 0) {
               history.replace('/quizmaster/pickcategories')
-            } else if (parsed.round.question.open) {
+            } else if (parsed.round.question.open === true || (parsed.round.question.open === false && parsed.round.question.answers.length !== 0)) {
               history.replace('/quizmaster/verifyanswers')
               dispatch(fetchAnswersAction())
             } else {
@@ -74,7 +73,7 @@ export default function recoverStateAction() {
               dispatch(appState.updateLoadingMessageAction('Waiting for quizmaster to verify team...'))
             } else if (parsed.team.verified) {
               history.replace('/quiz')
-              if (parsed.round.question && parsed.round.question.open) dispatch(appState.updateStatusAction('quizz'))
+              if (parsed.round && parsed.round.question.open) dispatch(appState.updateStatusAction('quizz'))
               else dispatch(appState.updateStatusAction('loading'))
             }
           }

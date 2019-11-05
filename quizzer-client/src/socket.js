@@ -2,6 +2,7 @@ import * as GLOBALS from './globals'
 
 import * as fetchState from './actions/fetchStateActions'
 import * as appState from './actions/appStateActions'
+import * as quizState from './actions/quizStateActions'
 
 import fetchTeams from './actions/async/fetchTeamsAction'
 import fetchAnswers from './actions/async/fetchAnswersAction'
@@ -29,10 +30,8 @@ export const createConnectedSocket = dispatch => {
  * actions to the redux store.
  */
 const attachSocketListeners = (socket, dispatch) => {
-  // const { dispatch } = store
-
   socket.onopen = () => {
-    // Notifying on open gets annoying
+    // Do nothing for now
   }
 
   socket.onerror = event => {
@@ -75,8 +74,20 @@ const attachSocketListeners = (socket, dispatch) => {
         dispatch(fetchState.updateFetchingMessageAction('Your team name was denied'))
         dispatch(appState.updateStatusAction('enteringTeam'))
         break;
+      case 'answer_approved':
+        dispatch(appState.updateStatusAction('answerCorrect'))
+        break;
+      case 'answer_denied':
+        dispatch(appState.updateStatusAction('answerIncorrect'))
+        dispatch(quizState.setAnswerAction(msg.answer))
+        break;
+      case 'question_closed':
+        dispatch(appState.updateLoadingMessageAction('Waiting for quizmaster to verify answer...'))
+        dispatch(appState.updateStatusAction('loading'))
+        break;
       case 'next_question':
         dispatch(appState.updateStatusAction('quizz'))
+        dispatch(quizState.setAnswerAction(null))
         dispatch(recoverStateAction())
         break;
       case 'new_team':

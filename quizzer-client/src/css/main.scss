@@ -217,6 +217,56 @@ a.bare-link {
   }
 }
 
+.question-result {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    margin-bottom: 3em;
+  }
+
+  p {
+    font-size: 3em;
+    font-weight: bold;
+    font-style: italic;
+    color: $charcoal;
+    text-align: center;
+  }
+
+  p.answer {
+    font-size: 1.2em;
+    font-weight: normal;
+    font-style: normal;
+    color: darken($charcoal, 10);
+    span {
+      display: block;
+      font-style: italic;
+      color: inherit;
+      text-align: center;
+    }
+
+    span:before, span:after {
+      content: '"'
+    }
+  }
+
+  &.correct {
+    background: darken($correct, 20)
+  }
+
+  &.incorrect {
+    background: darken($incorrect, 20)
+  }
+}
+
   ////////////////
  // Admin view //
 ////////////////

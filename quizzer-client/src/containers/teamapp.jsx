@@ -12,6 +12,7 @@ import authenticateAction from '../actions/async/authenticateAction'
 import renameTeamAction from '../actions/async/renameTeamAction'
 import QuizQuestion from '../components/quizquestion';
 import submitAnswerAction from '../actions/async/submitAnswerAction';
+import QuestionResult from '../components/questionresult';
 
 /***********************
  ** TeamApp Component **
@@ -121,6 +122,12 @@ class TeamApp extends React.Component {
         </Landing>
       </Route>
       <Route exact path="/quiz">
+        <QuestionResult
+          correct={['answerIncorrect', 'answerCorrect'].includes(props.appState.status)
+            ? props.appState.status === 'answerCorrect'
+            : undefined}
+          answer={props.quizState.answer}
+        />
         <QuizQuestion
           submittedAnswer={props.quizState.answer}
           submitAnswer={props.submitAnswer}
