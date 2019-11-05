@@ -21,14 +21,8 @@ export default function recoverStateAction() {
 
     // Fetch game state from server 
     fetch(`${GLOBALS.API_URL}`, {
-      method: 'GET',
-      credentials: 'include',
-      cache: 'no-cache',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      ...GLOBALS.FETCH_OPTIONS,
+      method: 'GET'
     })
       .then(res => res.json()
         .then(parsed => {

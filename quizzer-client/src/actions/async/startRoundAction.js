@@ -16,14 +16,8 @@ export default function startRoundAction() {
     const { round } = getState().quizState
 
     fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/round`, {
-      method: 'PUT',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      ...GLOBALS.FETCH_OPTIONS,
+      method: 'PUT'
     })
       .then(res => res.json()
         .then(parsed => {

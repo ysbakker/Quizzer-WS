@@ -8,14 +8,8 @@ export default function fetchQuestionsAction(amt = 10) {
     dispatch(fetchState.updateFetchingAction(true))
 
     fetch(`${GLOBALS.API_URL}/questions/random?amount=${amt}`, {
-      method: 'GET',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      ...GLOBALS.FETCH_OPTIONS,
+      method: 'GET'
     })
       .then(res => res.json()
         .then(parsed => {

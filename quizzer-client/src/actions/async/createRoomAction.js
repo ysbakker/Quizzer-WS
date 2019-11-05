@@ -14,14 +14,8 @@ export default function createRoomAction() {
     dispatch(appState.updateLoadingMessageAction('Creating room...'))
 
     fetch(`${GLOBALS.API_URL}/rooms`, {
+      ...GLOBALS.FETCH_OPTIONS,
       method: 'POST',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         roomname: getState().appState.currentRoomName,
         password: getState().adminState.password

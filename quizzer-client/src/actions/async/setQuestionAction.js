@@ -4,7 +4,6 @@ import * as quizState from '../quizStateActions'
 import { history } from '../../containers/quizzer'
 
 import * as GLOBALS from '../../globals'
-import recoverStateAction from './recoverStateAction'
 
 export default function setQuestionAction(q) {
   return (dispatch, getState) => {
@@ -13,14 +12,8 @@ export default function setQuestionAction(q) {
     const { currentRoomNumber } = getState().appState
 
     fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/round`, {
+      ...GLOBALS.FETCH_OPTIONS,
       method: 'PATCH',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         questionId: q
       })

@@ -10,14 +10,8 @@ export default function fetchTeamsAction() {
     const { currentRoomNumber } = getState().appState
 
     fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/teams/`, {
+      ...GLOBALS.FETCH_OPTIONS,
       method: 'GET',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
     })
       .then(res => res.json()
         // .then(parsed => new Promise(resolve => setTimeout(() => resolve(parsed), 500))) // Simulates loading time

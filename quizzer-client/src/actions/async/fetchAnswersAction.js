@@ -10,14 +10,8 @@ export default function fetchCategoriesAction() {
     const { currentRoomNumber } = getState().appState
 
     fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/round/answers`, {
-      method: 'GET',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      }
+      ...GLOBALS.FETCH_OPTIONS,
+      method: 'GET'
     })
       .then(res => res.json()
         .then(parsed => {

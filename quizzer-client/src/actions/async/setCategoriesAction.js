@@ -12,14 +12,8 @@ export default function setCategoriesAction(cats) {
     const { currentRoomNumber } = getState().appState
 
     fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/round`, {
+      ...GLOBALS.FETCH_OPTIONS,
       method: 'PATCH',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         categories: cats
       })

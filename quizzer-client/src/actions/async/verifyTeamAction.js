@@ -11,14 +11,8 @@ export default function verifyTeamAction(teamid, accepted) {
     const { currentRoomNumber } = getState().appState
 
     fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/teams/${teamid}`, {
+      ...GLOBALS.FETCH_OPTIONS,
       method: 'PATCH',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
       body: accepted ?
         JSON.stringify({
           verified: true

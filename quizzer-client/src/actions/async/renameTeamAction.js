@@ -13,14 +13,8 @@ export default function renameTeamAction(teamname) {
     const { currentRoomNumber, teamId } = getState().appState
 
     fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/teams/${teamId}`, {
+      ...GLOBALS.FETCH_OPTIONS,
       method: 'PATCH',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         name: teamname
       })

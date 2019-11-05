@@ -12,14 +12,8 @@ export default function authenticateAction(roomid, password) {
     dispatch(appState.updateLoadingMessageAction('Connecting to WebSocket...'))
 
     fetch(`${GLOBALS.API_URL}/rooms/${roomid}/teams`, {
+      ...GLOBALS.FETCH_OPTIONS,
       method: 'POST',
-      cache: 'no-cache',
-      credentials: 'include',
-      mode: 'cors',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
       body: JSON.stringify({
         password: password
       })
