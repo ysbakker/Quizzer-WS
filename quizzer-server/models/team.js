@@ -14,6 +14,10 @@ const teamSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Room',
     required: true
+  },
+  points: {
+    type: Number,
+    default: 0
   }
 })
 

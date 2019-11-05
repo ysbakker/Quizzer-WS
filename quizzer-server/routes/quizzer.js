@@ -187,16 +187,16 @@ router.get('/', middleware.checkIfUserIsInRoom, async (req, res, next) => {
       team: t,
       currentQuestion: r.currentQuestion,
       currentRound: r.currentRound,
-      round: {
-        question: r.currentQuestion !== 0 ? {
+      round: r.currentQuestion !== 0 ? {
+        question: {
           open: r.round.question.open,
-          questiondata: {
+          questiondata: r.round.question.questiondata !== null ? {
             _id: r.round.question.questiondata._id,
             question: r.round.question.questiondata.question,
             category: r.round.question.questiondata.category
-          }
-        } : undefined,
-      }
+          } : undefined
+        },
+      } : undefined,
     })
   }
 })
@@ -310,21 +310,53 @@ router.get('/rooms/:roomid/teams', middleware.checkIfRoomExists, middleware.chec
   })
 })
 
+const determinePoints = score => {
+  const compare = (x, y) => {
+    if (x.correct > y.correct) return -1
+    if (x.correct < y.correct) return 1
+
+    return 0
+  }
+
+  const sorted = score.sort(compare)
+
+  const points = sorted.map(s => ({ team: s.team, points: 0.1 }))
+  if (points.length >= 1) points[0].points = 4;
+  if (points.length >= 2) points[1].points = sorted[1].correct === sorted[0].correct ? 4 : 2;
+  if (points.length >= 3) points[2].points = sorted[2].correct === sorted[0].correct ? 4
+    : (sorted[2].correct === sorted[1].correct ? 2 : 1);
+
+  return points
+}
+
 router.put('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
-  const { room } = models
+  const { room, team } = models
   const { roomid } = req.params
 
   const r = await room.model.findOne({
     number: roomid
-  })
+  }).populate('teams')
 
-  if (r.round === undefined || (r.currentRound !== r.round.roundNumber && !r.round.open)) {
+  if (r.round === undefined || r.currentQuestion >= 12) {
+    if (r.round !== undefined) {
+      const points = determinePoints(r.round.score)
+      if (points) {
+        const t = await team.model.find({ room: r._id })
+        points.forEach(p => {
+          t.find(t => t._id.toString() === p.team.toString()).points += p.points
+        })
+        for (const team of t) {
+          await team.save()
+        }
+      }
+    }
     const newRound = {
       roundNumber: r.currentRound + 1
     }
 
     r.round = newRound
     r.currentRound = newRound.roundNumber
+    r.currentQuestion = 0
   } else {
     // This means the round hasn't completed yet, so the quizmaster
     // shouldn't be able to start a new one
@@ -357,10 +389,15 @@ router.put('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.chec
 
 router.patch('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { room, question } = models
-  const { categories, questionId } = req.body
+  const { categories, questionId, correct, team, open } = req.body
   const { roomid } = req.params
 
-  const operations = [{ operation: 'categories', val: categories }, { operation: 'question', val: questionId }]
+  const operations = [
+    { operation: 'categories', val: categories },
+    { operation: 'question', val: questionId },
+    { operation: 'score', val: correct !== undefined && team ? { correct, team } : undefined },
+    { operation: 'open', val: open }
+  ]
   // Allowed PATCH operations
   if (operations.every(i => i.val === undefined)) {
     const e = new Error('Invalid PATCH operation!')
@@ -370,6 +407,9 @@ router.patch('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.ch
 
   const r = await room.model.findOne({
     number: roomid
+  }).populate({
+    path: 'round.question.questiondata',
+    model: 'Question'
   })
 
   if (r.round === undefined || r.round.roundNumber !== r.currentRound) {
@@ -407,6 +447,19 @@ router.patch('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.ch
           e.rescode = 403
           return next(e)
         }
+      } else if (op.operation === 'score') {
+        r.round.question.answers = r.round.question.answers.filter(a => a.team.toString() !== op.val.team.toString())
+        if (r.round.score.find(s => s.team.toString() === op.val.team.toString())) {
+          const score = r.round.score.find(s => s.team.toString() === op.val.team.toString());
+          score.team = op.val.team
+          score.correct = op.val.correct ? score.correct + 1 : score.correct
+        } else {
+          r.round.score.push(op.val)
+        }
+
+
+      } else if (op.operation === 'open') {
+        r.round.question.open = op.val
       }
     }
   }
@@ -434,6 +487,13 @@ router.patch('/rooms/:roomid/round', middleware.checkIfRoomExists, middleware.ch
       }))
       else if (operations.find(op => op.operation === 'question').val) client.send(JSON.stringify({
         mType: 'next_question'
+      }))
+      else if (operations.find(op => op.operation === 'open').val !== undefined) client.send(JSON.stringify({
+        mType: 'question_closed'
+      }))
+      else if (operations.find(op => op.operation === 'score').val) client.send(JSON.stringify({
+        mType: `answer_${operations.find(op => op.operation === 'score').val.correct ? 'approved' : 'denied'}`,
+        answer: r.round.question.questiondata.answer
       }))
     }
   })

@@ -25,8 +25,15 @@ const roundSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Team'
       }
-    }]
-  }
+    }],
+  },
+  score: [{
+    correct: Number,
+    team: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Team'
+    }
+  }]
 })
 
 module.exports = {
