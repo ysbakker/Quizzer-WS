@@ -9,6 +9,30 @@ const middleware = require('./middleware')
 const wss = require('../socket')
 
 /**
+ * This function is used to determine the points
+ * a team gets for the round
+ */
+const determinePoints = score => {
+  const compare = (x, y) => {
+    if (x.correct > y.correct) return -1
+    if (x.correct < y.correct) return 1
+
+    return 0
+  }
+
+  const sorted = score.sort(compare)
+
+  const points = sorted.map(s => ({ team: s.team, points: 0.1 }))
+  if (points.length >= 1) points[0].points = 4;
+  if (points.length >= 2) points[1].points = sorted[1].correct === sorted[0].correct ? 4 : 2;
+  if (points.length >= 3) points[2].points = sorted[2].correct === sorted[0].correct ? 4
+    : (sorted[2].correct === sorted[1].correct ? 2 : 1);
+
+  return points
+}
+
+
+/**
  * From this point, all API routes require the client to be quizmaster.
  */
 router.use(middleware.checkIfUserIsQuizmaster)
@@ -25,7 +49,7 @@ router.delete('/:roomid', middleware.checkIfRoomExists, middleware.checkIfUserIs
  * This route lets the quizmaster close the room
  */
 router.patch('/:roomid', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
-  const { room } = models
+  const { room, team } = models
   const { roomid } = req.params
   const { open } = req.body
 
@@ -41,6 +65,17 @@ router.patch('/:roomid', middleware.checkIfRoomExists, middleware.checkIfUserIsI
     const e = new Error('You can\'t close the round as a round is still in progress!')
     e.rescode = 403
     return next(e)
+  }
+
+  const points = determinePoints(r.round.score)
+  if (points) {
+    const t = await team.model.find({ room: r._id })
+    points.forEach(p => {
+      t.find(t => t._id.toString() === p.team.toString()).points += p.points
+    })
+    for (const team of t) {
+      await team.save()
+    }
   }
 
   r.open = false
@@ -61,7 +96,7 @@ router.patch('/:roomid', middleware.checkIfRoomExists, middleware.checkIfUserIsI
    * Send a message to the teams that the quiz closed
    */
   wss.clients.forEach(client => {
-    if (client.role === 'team' && client.teamid.toString() === t._id.toString()) {
+    if (client.role === 'team' && client.room.toString() === r._id.toString()) {
       client.send(JSON.stringify({
         mType: 'quiz_closed'
       }))
@@ -119,25 +154,6 @@ router.patch('/:roomid/teams/:teamid', middleware.checkIfRoomExists, middleware.
     }
   })
 })
-
-const determinePoints = score => {
-  const compare = (x, y) => {
-    if (x.correct > y.correct) return -1
-    if (x.correct < y.correct) return 1
-
-    return 0
-  }
-
-  const sorted = score.sort(compare)
-
-  const points = sorted.map(s => ({ team: s.team, points: 0.1 }))
-  if (points.length >= 1) points[0].points = 4;
-  if (points.length >= 2) points[1].points = sorted[1].correct === sorted[0].correct ? 4 : 2;
-  if (points.length >= 3) points[2].points = sorted[2].correct === sorted[0].correct ? 4
-    : (sorted[2].correct === sorted[1].correct ? 2 : 1);
-
-  return points
-}
 
 /**
  * Start a new round
@@ -285,6 +301,11 @@ router.put('/:roomid/round/question', middleware.checkIfRoomExists, middleware.c
     e.rescode = 400
     return next(e)
   }
+  if (r.usedQuestions.find(q => q._id.toString() === questionId._id.toString()) !== undefined) {
+    const e = new Error('This question was already used!')
+    e.rescode = 400
+    return next(e)
+  }
 
   if (r.round.question === undefined || !r.round.question.open) {
     r.round.question.questiondata = q._id
@@ -390,7 +411,7 @@ router.patch('/:roomid/round/question', middleware.checkIfRoomExists, middleware
       if (operations.find(op => op.operation === 'open').val !== undefined) client.send(JSON.stringify({
         mType: 'question_closed'
       }))
-      else if (operations.find(op => op.operation === 'score').val) client.send(JSON.stringify({
+      else if (operations.find(op => op.operation === 'score').val) if (client.teamid.toString() === team.toString()) client.send(JSON.stringify({
         mType: `answer_${operations.find(op => op.operation === 'score').val.correct ? 'approved' : 'denied'}`,
         answer: r.round.question.questiondata.answer
       }))

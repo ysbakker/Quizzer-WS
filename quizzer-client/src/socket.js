@@ -88,6 +88,7 @@ const attachSocketListeners = (socket, dispatch) => {
         dispatch(fetchSession())
         break;
       case 'quiz_closed':
+        dispatch(fetchSession())
         dispatch(appState.updateStatusAction('closed'))
         break;
       default:

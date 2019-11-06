@@ -25,6 +25,15 @@ export default function fetchSession(recover = false) {
           dispatch(fetchState.updateFetchAction({ fetching: false, result: null, message: null }))
           history.location.pathname.includes('quizmaster') ? history.replace('/quizmaster/create') : history.replace('/authenticate')
         } else {
+          // Get the teams
+          if (data.teams.length > 0) {
+            dispatch(adminState.clearTeamsAction())
+            data.teams.forEach(t => {
+              if (t.name) dispatch(adminState.addTeamAction(t))
+              if (t.name && t.verified) dispatch(adminState.approveTeamAction(t._id))
+            })
+          }
+
           dispatch(fetchState.updateFetchAction({ fetching: false, result: null, message: null }))
           if (recover) {
             dispatch(fetchState.updateFetchAction({ fetching: false, result: 'success', message: 'Welcome back!' }))
@@ -44,15 +53,6 @@ export default function fetchSession(recover = false) {
            * -> To prevent storing large socket object in redux store
            */
           if (recover) window.socket = createConnectedSocket(dispatch)
-
-          // Get the teams
-          if (data.teams.length > 0) {
-            dispatch(adminState.clearTeamsAction())
-            data.teams.forEach(t => {
-              if (t.name) dispatch(adminState.addTeamAction(t))
-              if (t.name && t.verified) dispatch(adminState.approveTeamAction(t._id))
-            })
-          }
 
           if (data.role === 'quizmaster') {
             dispatch(adminState.updateRoomPasswordAction(data.password))

@@ -31,7 +31,7 @@ router.get('/random', middleware.checkIfRoomExists, middleware.checkIfUserIsInRo
   while (selectedQuestions.length < count && iterations <= 1000) {
     const r = Math.floor(Math.random() * questions.length)
 
-    if ((!r.usedQuestions || !r.usedQuestions.includes(questions[r]._id)) && !selectedQuestions.find(q => q._id === questions[r]._id)) {
+    if ((!r.usedQuestions || !r.usedQuestions.includes(questions[r]._id.toString())) && !selectedQuestions.find(q => q._id === questions[r]._id)) {
       selectedQuestions.push(questions[r])
     }
     iterations++

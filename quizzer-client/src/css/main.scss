@@ -530,7 +530,7 @@ ul.list-container {
   @keyframes breathe {
     0% {
       color: $titanium;
-      font-size: 1.5em;
+      font-size: 1em;
       transform: rotate(0);
     }
     25% {
@@ -538,7 +538,7 @@ ul.list-container {
     }
     50% {
       color: $correct;
-      font-size: 1.8em;
+      font-size: 1.4em;
       transform: rotate(0);
     }
     75% {
@@ -546,7 +546,7 @@ ul.list-container {
     }
     100% {
       color: $titanium;
-      font-size: 1.5em;
+      font-size: 1em;
       transform: rotate(0);
     }
   }

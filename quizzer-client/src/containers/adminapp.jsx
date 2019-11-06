@@ -202,7 +202,7 @@ class AdminApp extends React.Component {
           {quizState.question && quizState.question.open ?
             <SelectListView
               title={`Waiting for answers...`}
-              items={adminState.teamAnswers.map(a => ({ id: a.team, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
+              items={adminState.teamAnswers.map(a => ({ id: a.team, text: `"${a.answer}"`, sub: { Team: adminState.approvedTeams.find(t => t._id === a.team) ? adminState.approvedTeams.find(t => t._id === a.team).name : '' } }))}
               selectedIds={[]}
               handlers={{
                 onSelectHandler: () => null, // do nothing
