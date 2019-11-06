@@ -45,17 +45,17 @@ export default function fetchSession(recover = false) {
            */
           if (recover) window.socket = createConnectedSocket(dispatch)
 
+          // Get the teams
+          if (data.teams.length > 0) {
+            dispatch(adminState.clearTeamsAction())
+            data.teams.forEach(t => {
+              if (t.name) dispatch(adminState.addTeamAction(t))
+              if (t.name && t.verified) dispatch(adminState.approveTeamAction(t._id))
+            })
+          }
+
           if (data.role === 'quizmaster') {
             dispatch(adminState.updateRoomPasswordAction(data.password))
-
-            // Get the teams
-            if (data.teams.length > 0) {
-              dispatch(adminState.clearTeamsAction())
-              data.teams.forEach(t => {
-                if (t.name) dispatch(adminState.addTeamAction(t))
-                if (t.name && t.verified) dispatch(adminState.approveTeamAction(t._id))
-              })
-            }
 
             // Determine where to send the user
             if (data.currentRound === 0) {
@@ -95,7 +95,9 @@ export default function fetchSession(recover = false) {
             }
           }
 
-          if (data.open === false) dispatch(appState.updateStatusAction('closed'))
+          if (data.open === false) {
+            dispatch(appState.updateStatusAction('closed'))
+          }
         }
       })
       .catch(err => {

@@ -6,6 +6,7 @@ import { createBrowserHistory } from 'history'
 import TeamApp from './teamapp'
 import AdminApp from './adminapp'
 import AlertBar from '../components/alertbar'
+import Scores from '../components/scores'
 
 import fetchSession from '../actions/async/fetchSession'
 
@@ -21,7 +22,10 @@ class Quizzer extends React.Component {
 
     // Display when the quiz is closed
     if (props.appState.status === 'closed') {
-      return <h1>Quiz closed!</h1>
+      return <Scores
+        roomname={props.appState.currentRoomName}
+        scores={props.adminState.approvedTeams.map(t => ({ name: t.name, points: t.points }))}
+      />
     }
     return <Router history={history}>
       {props.fetchState.result !== null
@@ -44,7 +48,7 @@ function mapStateToProps(state) {
   return {
     fetchState: state.fetchState,
     appState: state.appState,
-    quizState: state.quizState
+    adminState: state.adminState
   }
 }
 

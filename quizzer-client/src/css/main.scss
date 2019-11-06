@@ -471,3 +471,83 @@ ul.list-container {
     margin-right: 0;
   }
 }
+
+  ////////////////
+ // Scoreboard //
+////////////////
+
+.score-panel {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  h2 {
+    font-size: 2em;
+    text-align: center;
+    color: tomato;
+    font-style: italic;
+  }
+  p.sub {
+    color: #aaa;
+    font-size: 1.3em;
+  }
+  ol {
+    text-align: center;
+    list-style-type: none;
+  }
+  li {
+    margin-top: 2em;
+    font-weight: bold;
+    .score-name {
+      font-size: 1.5em;
+    }
+  }
+  li:first-child {
+    font-size: 2em;
+    .score-name {
+      animation: breathe 1s infinite linear;
+    }
+    .score-score {
+      animation: spread .4s infinite linear;
+    }
+  }
+
+  @keyframes spread {
+    0% {
+      letter-spacing: 0;
+      font-size: 1em;
+    }
+    50% {
+      letter-spacing: 10px;
+      font-size: 1.2em;
+    }
+    100% {
+      letter-spacing: 0;
+      font-size: 1em;
+    }
+  }
+
+  @keyframes breathe {
+    0% {
+      color: $titanium;
+      font-size: 1.5em;
+      transform: rotate(0);
+    }
+    25% {
+      transform: rotate(10deg);
+    }
+    50% {
+      color: $correct;
+      font-size: 1.8em;
+      transform: rotate(0);
+    }
+    75% {
+      transform: rotate(-10deg);
+    }
+    100% {
+      color: $titanium;
+      font-size: 1.5em;
+      transform: rotate(0);
+    }
+  }
+}
