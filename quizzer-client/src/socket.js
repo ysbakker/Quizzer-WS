@@ -4,11 +4,8 @@ import * as fetchState from './actions/fetchStateActions'
 import * as appState from './actions/appStateActions'
 import * as quizState from './actions/quizStateActions'
 
-import fetchTeams from './actions/async/fetchTeamsAction'
-import fetchAnswers from './actions/async/fetchAnswersAction'
-
 import { history } from './containers/quizzer'
-import recoverStateAction from './actions/async/recoverStateAction'
+import fetchSession from './actions/async/fetchSession'
 
 /********************
  ** WebSocket conf **
@@ -35,15 +32,13 @@ const attachSocketListeners = (socket, dispatch) => {
   }
 
   socket.onerror = event => {
-    dispatch(fetchState.updateFetchingResultAction(null))
-    dispatch(fetchState.updateFetchingMessageAction('Socket error occured.'))
-    dispatch(fetchState.updateFetchingResultAction('error'))
+    dispatch(fetchState.updateFetchAction({ result: null, message: null }))
+    dispatch(fetchState.updateFetchAction({ result: 'error', message: 'Socket error occured.' }))
   }
 
   socket.onclose = event => {
-    dispatch(fetchState.updateFetchingResultAction(null))
-    dispatch(fetchState.updateFetchingMessageAction('Unexpectedly lost WebSocket connection: please refresh the page.'))
-    dispatch(fetchState.updateFetchingResultAction('error'))
+    dispatch(fetchState.updateFetchAction({ result: null, message: null }))
+    dispatch(fetchState.updateFetchAction({ result: 'error', message: 'Unexpectedly lost WebSocket connection: please refresh the page.' }))
   }
 
   socket.onmessage = event => {
@@ -59,19 +54,15 @@ const attachSocketListeners = (socket, dispatch) => {
         dispatch(appState.updateLoadingMessageAction('Waiting for the first question to start...'))
         break;
       case 'name_approved':
-        dispatch(fetchState.updateFetchingAction(false))
-        dispatch(fetchState.updateFetchingResultAction(null))
-        dispatch(fetchState.updateFetchingResultAction('success'))
-        dispatch(fetchState.updateFetchingMessageAction('Your team name was approved'))
+        dispatch(fetchState.updateFetchAction({ fetching: false, result: null, message: null }))
+        dispatch(fetchState.updateFetchAction({ result: 'success', message: 'Your team name was approved' }))
         dispatch(appState.updateStatusAction('loading'))
         dispatch(appState.updateLoadingMessageAction('Waiting for the round to start...'))
         history.push('/quiz')
         break;
       case 'name_denied':
-        dispatch(fetchState.updateFetchingAction(false))
-        dispatch(fetchState.updateFetchingResultAction(null))
-        dispatch(fetchState.updateFetchingResultAction('error'))
-        dispatch(fetchState.updateFetchingMessageAction('Your team name was denied'))
+        dispatch(fetchState.updateFetchAction({ fetching: false, result: null, message: null }))
+        dispatch(fetchState.updateFetchAction({ result: 'error', message: 'Your team name was denied' }))
         dispatch(appState.updateStatusAction('enteringTeam'))
         break;
       case 'answer_approved':
@@ -88,13 +79,13 @@ const attachSocketListeners = (socket, dispatch) => {
       case 'next_question':
         dispatch(appState.updateStatusAction('quizz'))
         dispatch(quizState.setAnswerAction(null))
-        dispatch(recoverStateAction())
+        dispatch(fetchSession())
         break;
       case 'new_team':
-        dispatch(fetchTeams())
+        dispatch(fetchSession())
         break;
       case 'new_answer':
-        dispatch(fetchAnswers())
+        dispatch(fetchSession())
         break;
       default:
         console.log('Message with unknown mType received:', msg)

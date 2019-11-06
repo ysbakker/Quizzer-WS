@@ -8,7 +8,7 @@ import Logo from '../components/logo'
 import LoadingSpinner from '../components/loadingspinner'
 
 import * as appStateActions from '../actions/appStateActions'
-import authenticateAction from '../actions/async/authenticateAction'
+import authenticateAction from '../actions/async/authenticate'
 import renameTeamAction from '../actions/async/renameTeamAction'
 import QuizQuestion from '../components/quizquestion';
 import submitAnswerAction from '../actions/async/submitAnswerAction';

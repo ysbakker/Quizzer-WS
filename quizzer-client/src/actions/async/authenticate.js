@@ -2,28 +2,28 @@ import * as appState from '../appStateActions'
 import * as fetchState from '../fetchStateActions'
 
 import { createConnectedSocket } from '../../socket'
-import { history } from '../../containers/quizzer'
 
 import defaultFetch from './defaultFetch'
 
-export default function createRoomAction() {
-  return (dispatch, getState) => {
+export default function authenticate(roomid, password) {
+  return dispatch => {
     dispatch(fetchState.updateFetchAction({ fetching: true, result: null, message: null }))
     dispatch(appState.updateStatusAction('loading'))
-    dispatch(appState.updateLoadingMessageAction('Creating room...'))
+    dispatch(appState.updateLoadingMessageAction('Connecting to WebSocket...'))
 
-    defaultFetch(`/rooms`, 'POST', JSON.stringify({ roomname: getState().appState.currentRoomName, password: getState().adminState.password }))
+    defaultFetch(`/rooms/${roomid}/teams`, 'POST', JSON.stringify({ password: password }))
       .then(r => {
         const { APIerr, data } = r
         if (APIerr) {
           const { error } = data
           dispatch(fetchState.updateFetchAction({ fetching: false, result: 'error', message: error }))
-          dispatch(appState.updateStatusAction('enteringName'))
+          if (APIerr === 401) dispatch(appState.updateStatusAction('enteringPassword'))
+          else dispatch(appState.updateStatusAction('enteringRoom'))
         } else {
-          const { success } = data
-          dispatch(fetchState.updateFetchAction({ fetching: false, result: 'success', message: success }))
-          dispatch(appState.updateStatusAction('verifyTeams'))
-          dispatch(appState.updateRoomNumberAction(data.number))
+          dispatch(fetchState.updateFetchAction({ fetching: false, result: 'success', message: data.success }))
+          dispatch(appState.updateRoomNameAction(data.roomname))
+          dispatch(appState.updateTeamIdAction(data.teamid))
+          dispatch(appState.updateStatusAction('enteringTeam'))
 
           /**
            * Open a socket and store it in 'window'
@@ -31,13 +31,11 @@ export default function createRoomAction() {
            * -> To prevent storing large socket object in redux store
            */
           window.socket = createConnectedSocket(dispatch)
-
-          history.replace('/quizmaster/verifyteams')
         }
       })
       .catch(err => {
         dispatch(fetchState.updateFetchAction({ fetching: false, result: 'error', message: err }))
-        dispatch(appState.updateStatusAction('enteringName'))
+        dispatch(appState.updateStatusAction('enteringRoom'))
       })
   }
 }

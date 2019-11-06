@@ -201,7 +201,7 @@ class AdminApp extends React.Component {
           {quizState.question && quizState.question.open ?
             <SelectListView
               title={`Waiting for answers...`}
-              items={adminState.teamAnswers.map(a => ({ id: a.team._id, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
+              items={adminState.teamAnswers.map(a => ({ id: a.team, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
               selectedIds={[]}
               handlers={{
                 onSelectHandler: () => null, // do nothing
@@ -210,7 +210,7 @@ class AdminApp extends React.Component {
             /> :
             <ApproveListView
               title={`Verify Answers`}
-              items={adminState.teamAnswers.map(a => ({ id: a.team._id, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
+              items={adminState.teamAnswers.map(a => ({ id: a.team, text: `"${a.answer}"`, sub: { Team: a.team.name } }))}
               handlers={{
                 acceptHandler: (team) => props.verifyAnswer(team, true),
                 denyHandler: (team) => props.verifyAnswer(team, false)

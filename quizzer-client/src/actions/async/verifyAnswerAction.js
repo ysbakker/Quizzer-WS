@@ -1,44 +1,25 @@
 import * as fetchState from '../fetchStateActions'
 
-import fetchAnswersAction from './fetchAnswersAction'
-
-import * as GLOBALS from '../../globals'
+import fetchSession from './fetchSession'
+import defaultFetch from './defaultFetch'
 
 export default function verifyAnswerAction(team, correct) {
   return (dispatch, getState) => {
-    dispatch(fetchState.updateFetchingResultAction(null))
-    dispatch(fetchState.updateFetchingAction(true))
+    dispatch(fetchState.updateFetchAction({ fetching: true, result: null, message: null }))
 
-    const { currentRoomNumber } = getState().appState
-
-    fetch(`${GLOBALS.API_URL}/rooms/${currentRoomNumber}/round`, {
-      ...GLOBALS.FETCH_OPTIONS,
-      method: 'PATCH',
-      body: JSON.stringify({
-        team,
-        correct
+    defaultFetch(`/rooms/${getState().appState.currentRoomNumber}/round/question`, 'PATCH', JSON.stringify({ team, correct }))
+      .then(r => {
+        const { APIerr, data } = r
+        if (APIerr) {
+          const { error } = data
+          dispatch(fetchState.updateFetchAction({ fetching: false, result: 'error', message: error }))
+        } else {
+          dispatch(fetchState.updateFetchAction({ fetching: false, result: 'success', message: data.success }))
+          dispatch(fetchSession())
+        }
       })
-    })
-      .then(res => res.json()
-        .then(parsed => {
-          if (!res.ok) throw parsed
-          dispatch(fetchState.updateFetchingAction(false))
-          dispatch(fetchState.updateFetchingResultAction('success'))
-          dispatch(fetchState.updateFetchingMessageAction(parsed.success))
-          dispatch(fetchAnswersAction())
-        })
-        .catch(parsed => {
-          const { error } = parsed
-          dispatch(fetchState.updateFetchingAction(false))
-          dispatch(fetchState.updateFetchingResultAction('error'))
-          dispatch(fetchState.updateFetchingMessageAction(error))
-        })
-      )
       .catch(err => {
-        console.log('fetch error: ', err)
-        dispatch(fetchState.updateFetchingAction(false))
-        dispatch(fetchState.updateFetchingResultAction('error'))
-        dispatch(fetchState.updateFetchingMessageAction('Couldn\'t fetch from API'))
+        dispatch(fetchState.updateFetchAction({ fetching: false, result: 'error', message: err }))
       })
   }
 }

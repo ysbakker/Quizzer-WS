@@ -12,9 +12,7 @@ export const ADD_TEAM = 'add team to pending teams'
 export const CLEAR_TEAMS = 'clear all teams'
 export const SET_ANSWERS = 'set pickable answers'
 
-export const UPDATE_FETCHING = 'update if the application is fetching'
-export const UPDATE_FETCHING_RESULT = 'update the result of the fetch (success/error)'
-export const UPDATE_FETCHING_MESSAGE = 'update the result message'
+export const UPDATE_FETCHSTATE = 'update application fetch state'
 
 export const SET_PICKABLE_CATS = 'Set categories the quizmaster can choose from'
 export const ADD_CAT = 'Add category to current round'

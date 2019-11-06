@@ -1,26 +1,10 @@
 import {
-  UPDATE_FETCHING,
-  UPDATE_FETCHING_MESSAGE,
-  UPDATE_FETCHING_RESULT
+  UPDATE_FETCHSTATE
 } from './types'
 
-export function updateFetchingAction(bool) {
+export function updateFetchAction(fetchState) {
   return {
-    type: UPDATE_FETCHING,
-    payload: bool
-  }
-}
-
-export function updateFetchingMessageAction(message) {
-  return {
-    type: UPDATE_FETCHING_MESSAGE,
-    payload: message
-  }
-}
-
-export function updateFetchingResultAction(result) {
-  return {
-    type: UPDATE_FETCHING_RESULT,
-    payload: result
+    type: UPDATE_FETCHSTATE,
+    payload: fetchState
   }
 }

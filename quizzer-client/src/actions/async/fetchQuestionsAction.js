@@ -1,37 +1,25 @@
 import * as fetchState from '../fetchStateActions'
 import * as quizState from '../quizStateActions'
 
-import * as GLOBALS from '../../globals'
+import defaultFetch from './defaultFetch'
 
 export default function fetchQuestionsAction(amt = 10) {
   return dispatch => {
-    dispatch(fetchState.updateFetchingAction(true))
+    dispatch(fetchState.updateFetchAction({ fetching: true, result: null, message: null }))
 
-    fetch(`${GLOBALS.API_URL}/questions/random?amount=${amt}`, {
-      ...GLOBALS.FETCH_OPTIONS,
-      method: 'GET'
-    })
-      .then(res => res.json()
-        .then(parsed => {
-          if (!res.ok) throw parsed
-          dispatch(fetchState.updateFetchingAction(false))
-
-          dispatch(quizState.setPickableQuestionsAction(parsed.questions))
-        })
-        .catch(parsed => {
-          const { error } = parsed
-          dispatch(fetchState.updateFetchingResultAction(null))
-          dispatch(fetchState.updateFetchingAction(false))
-          dispatch(fetchState.updateFetchingResultAction('error'))
-          dispatch(fetchState.updateFetchingMessageAction(error))
-        })
-      )
+    defaultFetch(`/questions/random?amount=${amt}`, 'GET')
+      .then(r => {
+        const { APIerr, data } = r
+        if (APIerr) {
+          const { error } = data
+          dispatch(fetchState.updateFetchAction({ fetching: false, result: 'error', message: error }))
+        } else {
+          dispatch(fetchState.updateFetchAction({ fetching: false, result: null, message: null }))
+          dispatch(quizState.setPickableQuestionsAction(data.questions))
+        }
+      })
       .catch(err => {
-        console.log('fetch error: ', err)
-        dispatch(fetchState.updateFetchingResultAction(null))
-        dispatch(fetchState.updateFetchingAction(false))
-        dispatch(fetchState.updateFetchingResultAction('error'))
-        dispatch(fetchState.updateFetchingMessageAction('Couldn\'t fetch from API'))
+        dispatch(fetchState.updateFetchAction({ fetching: false, result: 'error', message: err }))
       })
   }
 }

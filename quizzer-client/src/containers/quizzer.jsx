@@ -7,13 +7,13 @@ import TeamApp from './teamapp'
 import AdminApp from './adminapp'
 import AlertBar from '../components/alertbar'
 
-import recoverStateAction from '../actions/async/recoverStateAction'
+import fetchSession from '../actions/async/fetchSession'
 
 export const history = createBrowserHistory()
 
 class Quizzer extends React.Component {
   componentDidMount() {
-    this.props.recoverState()
+    this.props.fetchSession(true)
   }
 
   render() {
@@ -43,7 +43,7 @@ function mapStateToProps(state) {
 
 function mapDispatchToProps(dispatch) {
   return {
-    recoverState: () => dispatch(recoverStateAction())
+    fetchSession: recover => dispatch(fetchSession(recover))
   }
 }
 

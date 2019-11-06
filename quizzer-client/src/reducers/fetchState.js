@@ -1,7 +1,5 @@
 import {
-  UPDATE_FETCHING,
-  UPDATE_FETCHING_RESULT,
-  UPDATE_FETCHING_MESSAGE
+  UPDATE_FETCHSTATE
 } from '../actions/types'
 
 // Default state
@@ -13,28 +11,8 @@ const initialState = {
 
 export default function fetchStateReducer(state = initialState, action) {
   switch (action.type) {
-    case UPDATE_FETCHING: {
-      const changes = {
-        fetching: action.payload
-      }
-      return {
-        ...state,
-        ...changes
-      }
-    }
-    case UPDATE_FETCHING_RESULT: {
-      const changes = {
-        result: action.payload
-      }
-      return {
-        ...state,
-        ...changes
-      }
-    }
-    case UPDATE_FETCHING_MESSAGE: {
-      const changes = {
-        message: action.payload
-      }
+    case UPDATE_FETCHSTATE: {
+      const changes = action.payload
       return {
         ...state,
         ...changes
