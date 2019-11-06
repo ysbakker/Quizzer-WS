@@ -151,7 +151,7 @@ router.patch('/:roomid/teams/:teamid', middleware.checkIfRoomExists, middleware.
 /**
  * A team can submit an answer through this route
  */
-router.patch('/rooms/:roomid/round/answers', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+router.patch('/:roomid/round/answers', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { room } = models
   const { roomid } = req.params
   const { answer } = req.body

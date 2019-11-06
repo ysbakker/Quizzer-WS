@@ -14,6 +14,62 @@ const wss = require('../socket')
 router.use(middleware.checkIfUserIsQuizmaster)
 
 /**
+ * This route is used for automatically deleting the room when there
+ * are no more clients left in the room
+ */
+router.delete('/:roomid', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+
+})
+
+/**
+ * This route lets the quizmaster close the room
+ */
+router.patch('/:roomid', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+  const { room } = models
+  const { roomid } = req.params
+  const { open } = req.body
+
+  if (open === undefined) {
+    const e = new Error('Invalid PATCH operation!')
+    e.rescode = 403
+    return next(e)
+  }
+
+  const r = await room.model.findOne({ number: roomid })
+
+  if (open !== false || r.currentQuestion < 12) {
+    const e = new Error('You can\'t close the round as a round is still in progress!')
+    e.rescode = 403
+    return next(e)
+  }
+
+  r.open = false
+
+  try {
+    await r.save()
+  } catch (err) {
+    const e = new Error(`Validation failed - ${err.message}`)
+    e.rescode = 400
+    return next(e)
+  }
+
+  res.json({
+    success: `Closed quiz succesfully`
+  })
+
+  /**
+   * Send a message to the teams that the quiz closed
+   */
+  wss.clients.forEach(client => {
+    if (client.role === 'team' && client.teamid.toString() === t._id.toString()) {
+      client.send(JSON.stringify({
+        mType: 'quiz_closed'
+      }))
+    }
+  })
+})
+
+/**
  * This route allows the quizmaster to deny / verify a team
  * The 'team' client does **NOT** have access to this route
  */
@@ -249,8 +305,11 @@ router.put('/:roomid/round/question', middleware.checkIfRoomExists, middleware.c
     return next(e)
   }
 
+  const q_raw = JSON.parse(JSON.stringify(r.round.question))
+  const q_data = JSON.parse(JSON.stringify(q))
   res.json({
-    success: "Set question succesfully"
+    success: "Set question succesfully",
+    question: { ...q_raw, ...q_data }
   })
 
   wss.clients.forEach(client => {
@@ -265,9 +324,9 @@ router.put('/:roomid/round/question', middleware.checkIfRoomExists, middleware.c
 /**
  * Quizmaster can close a question here and update the score
  */
-router.patch('/:roomid/round', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
+router.patch('/:roomid/round/question', middleware.checkIfRoomExists, middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { room, question } = models
-  const { correct, team, open } = req.body
+  const { correct, team, open, questionId } = req.body
   const { roomid } = req.params
 
   const operations = [

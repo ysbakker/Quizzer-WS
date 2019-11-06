@@ -28,7 +28,9 @@ router.get('/', middleware.checkIfUserIsInRoom, async (req, res, next) => {
     data.role = 'team'
     // Some data should not be visible to the team
     data.password = undefined
-    data.team
+    if (data.teams.find(t => t._id.toString() === session.teamid.toString())) {
+      data.teams.find(t => t._id.toString() === session.teamid.toString()).isSession = true
+    }
     if (data.round && data.round.question.questiondata) {
       data.round.question.questiondata.answer = undefined
       data.round.question.answers = data.round.question.answers.filter(a => a.team.toString() === session.teamid.toString())

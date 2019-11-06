@@ -40,6 +40,10 @@ const roomSchema = new mongoose.Schema({
   },
   round: {
     type: round.schema
+  },
+  open: {
+    type: Boolean,
+    default: true
   }
 })
 
