@@ -69,7 +69,8 @@ app.use(bodyParser.json())
 app.use(sessionParser);
 
 // Attach API routes
-app.use('/quizzer', require('./routes/quizzer'))
+app.use('/quizzer/session', require('./routes/session'))
+app.use('/quizzer/rooms', require('./routes/rooms'))
 
 // Error handling
 app.use((err, req, res, next) => {

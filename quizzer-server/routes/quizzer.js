@@ -8,49 +8,6 @@ const middleware = require('./middleware')
 const wss = require('../socket')
 
 /**
- * This endpoint creates a new room and authenticates the session
- * automatically. It also stores the room id in the session for 
- * recovery when the quizmaster disconnects.
- */
-router.post('/rooms', async (req, res, next) => {
-  const { password, roomname } = req.body
-
-  if (password === undefined || roomname === undefined) {
-    const e = new Error('No room name or password specified')
-    e.rescode = 400
-    return next(e)
-  }
-  const { model } = models.room
-
-  const room = new model({ name: roomname, password: password })
-
-  try {
-    room.number = await room.generateUniqueId()
-  } catch (err) {
-    // Couldn't generate id
-    err.rescode = 500
-    return next(err)
-  }
-
-  try {
-    await room.save()
-  } catch (err) {
-    const e = new Error(`Validation failed - ${err.message}`)
-    e.rescode = 400
-    return next(e)
-  }
-
-  req.session.auth = 1
-  req.session.role = 'quizmaster'
-  req.session.room = room._id
-
-  res.json({
-    success: 'Created room succesfully',
-    number: room.number
-  })
-})
-
-/**
  * This endpoint allows a user/team/client to join a room. Authentication
  * happens here.
  */
@@ -155,51 +112,7 @@ router.put('/rooms/:roomid/round/answers', middleware.checkIfRoomExists, middlew
   })
 })
 
-router.get('/', middleware.checkIfUserIsInRoom, async (req, res, next) => {
-  const { session } = req
-  const { room, team } = models
 
-  const r = await room.model.findById(session.room)
-    .populate('teams')
-    .populate({
-      path: 'round.question.questiondata',
-      model: 'Question'
-    })
-  if (r === undefined) {
-    const e = new Error('Room not found!')
-    e.rescode = 404
-    return next(e)
-  }
-
-  let t
-  if (session.teamid !== undefined) {
-    t = await team.model.findById(session.teamid)
-  }
-
-  if (session.role === 'quizmaster') {
-    res.json({ role: 'quizmaster', ...r._doc })
-  } else {
-    res.json({
-      role: 'team',
-      _id: r._id,
-      name: r.name,
-      number: r.number,
-      team: t,
-      currentQuestion: r.currentQuestion,
-      currentRound: r.currentRound,
-      round: r.currentQuestion !== 0 ? {
-        question: {
-          open: r.round.question.open,
-          questiondata: r.round.question.questiondata !== null ? {
-            _id: r.round.question.questiondata._id,
-            question: r.round.question.questiondata.question,
-            category: r.round.question.questiondata.category
-          } : undefined
-        },
-      } : undefined,
-    })
-  }
-})
 
 /**
  * The PATCH teams route is used by both the

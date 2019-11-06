@@ -5,17 +5,12 @@ const roundSchema = new mongoose.Schema({
     type: Number,
     required: true
   },
-  open: {
-    type: Boolean,
-    default: true
-  },
   categories: [String],
   question: {
     questiondata: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'Question'
     },
-    open: Boolean,
     answers: [{
       answer: {
         type: String,
