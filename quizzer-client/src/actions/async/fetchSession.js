@@ -27,7 +27,7 @@ export default function fetchSession(recover = false) {
         } else {
           dispatch(fetchState.updateFetchAction({ fetching: false, result: null, message: null }))
           if (recover) {
-            fetchState.updateFetchAction({ fetching: false, result: 'success', message: 'Welcome back!' })
+            dispatch(fetchState.updateFetchAction({ fetching: false, result: 'success', message: 'Welcome back!' }))
           }
 
           // We have an active session and received some game state from the server!
@@ -94,6 +94,8 @@ export default function fetchSession(recover = false) {
               }
             }
           }
+
+          if (data.open === false) dispatch(appState.updateStatusAction('closed'))
         }
       })
       .catch(err => {

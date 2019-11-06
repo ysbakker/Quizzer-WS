@@ -24,6 +24,7 @@ import AdminView from './adminview';
 import SelectItem from '../components/selectitem';
 import closeQuestionAction from '../actions/async/closeQuestionAction';
 import verifyAnswerAction from '../actions/async/verifyAnswerAction';
+import closeQuiz from '../actions/async/closeQuiz';
 
 /************************
  ** AdminApp Component **
@@ -165,7 +166,7 @@ class AdminApp extends React.Component {
               }
             }, {
               text: `Stop Quiz`, clickHandler: () => {
-                props.history.push('/quizmaster/pickcategories')
+                props.closeQuiz()
               }
             }]
             : [
@@ -249,7 +250,8 @@ function mapDispatchToProps(dispatch) {
     setQuestion: q => dispatch(quizStateActions.setQuestionAction(q)),
     setQuestionAsync: q => dispatch(setQuestionAction(q)),
     closeQuestion: () => dispatch(closeQuestionAction()),
-    verifyAnswer: (team, correct) => dispatch(verifyAnswerAction(team, correct))
+    verifyAnswer: (team, correct) => dispatch(verifyAnswerAction(team, correct)),
+    closeQuiz: () => dispatch(closeQuiz())
   }
 }
 

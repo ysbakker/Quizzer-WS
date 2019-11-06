@@ -87,6 +87,9 @@ const attachSocketListeners = (socket, dispatch) => {
       case 'new_answer':
         dispatch(fetchSession())
         break;
+      case 'quiz_closed':
+        dispatch(appState.updateStatusAction('closed'))
+        break;
       default:
         console.log('Message with unknown mType received:', msg)
         break

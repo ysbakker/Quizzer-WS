@@ -18,6 +18,11 @@ class Quizzer extends React.Component {
 
   render() {
     const { props } = this
+
+    // Display when the quiz is closed
+    if (props.appState.status === 'closed') {
+      return <h1>Quiz closed!</h1>
+    }
     return <Router history={history}>
       {props.fetchState.result !== null
         ? <AlertBar
@@ -37,7 +42,9 @@ class Quizzer extends React.Component {
 
 function mapStateToProps(state) {
   return {
-    fetchState: state.fetchState
+    fetchState: state.fetchState,
+    appState: state.appState,
+    quizState: state.quizState
   }
 }
 
