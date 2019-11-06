@@ -7,7 +7,7 @@ const middleware = require('./middleware')
 
 router.get('/', middleware.checkIfUserIsInRoom, async (req, res, next) => {
   const { session } = req
-  const { room, team } = models
+  const { room } = models
 
   const r = await room.model.findById(session.room)
     .populate('teams')
@@ -29,7 +29,7 @@ router.get('/', middleware.checkIfUserIsInRoom, async (req, res, next) => {
     // Some data should not be visible to the team
     data.password = undefined
     data.team
-    if (data.round) {
+    if (data.round && data.round.question.questiondata) {
       data.round.question.questiondata.answer = undefined
       data.round.question.answers = data.round.question.answers.filter(a => a.team.toString() === session.teamid.toString())
     }
