@@ -106,7 +106,7 @@ router.patch('/:roomid/teams/:teamid', middleware.checkIfRoomExists, middleware.
   const { name } = req.body
 
   const t = await team.model.findById(teamid)
-  const r = await room.model.findOne({ number: roomid })
+  const r = await room.model.findOne({ number: roomid }).populate('teams')
 
   // Check if the team is changing its own name
   if (teamid.toString() !== req.session.teamid.toString()) {
@@ -118,6 +118,12 @@ router.patch('/:roomid/teams/:teamid', middleware.checkIfRoomExists, middleware.
   // Allowed PATCH operations
   if (name === undefined) {
     const e = new Error('Invalid PATCH operation!')
+    e.rescode = 403
+    return next(e)
+  }
+
+  if (r.teams.find(t => t.name && t.name.toLowerCase() === name.toLowerCase())) {
+    const e = new Error('Team name invalid or already taken!')
     e.rescode = 403
     return next(e)
   }
