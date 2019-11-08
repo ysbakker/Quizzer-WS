@@ -130,6 +130,7 @@ router.patch('/:roomid/teams/:teamid', middleware.checkIfRoomExists, middleware.
     return next(e)
   }
 
+  if (verified === false) t.name = undefined
   t.verified = verified
 
   try {

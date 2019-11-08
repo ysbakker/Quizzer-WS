@@ -25,6 +25,7 @@ import SelectItem from '../components/selectitem';
 import closeQuestionAction from '../actions/async/closeQuestionAction';
 import verifyAnswerAction from '../actions/async/verifyAnswerAction';
 import closeQuiz from '../actions/async/closeQuiz';
+import fetchSession from '../actions/async/fetchSession';
 
 /************************
  ** AdminApp Component **
@@ -167,6 +168,7 @@ class AdminApp extends React.Component {
             }, {
               text: `Stop Quiz`, clickHandler: () => {
                 props.closeQuiz()
+                props.fetchSession()
               }
             }]
             : [
@@ -251,7 +253,8 @@ function mapDispatchToProps(dispatch) {
     setQuestionAsync: q => dispatch(setQuestionAction(q)),
     closeQuestion: () => dispatch(closeQuestionAction()),
     verifyAnswer: (team, correct) => dispatch(verifyAnswerAction(team, correct)),
-    closeQuiz: () => dispatch(closeQuiz())
+    closeQuiz: () => dispatch(closeQuiz()),
+    fetchSession: () => dispatch(fetchSession())
   }
 }
 
