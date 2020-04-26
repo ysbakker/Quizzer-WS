@@ -8,6 +8,16 @@ and a minimalistic React frontend. It uses the WebSocket architecture to add
 near-real-time functionality to the app. MongoDB is used for data storage and
 session recovery.
 
+## Docker
+
+This application can be deployed with docker. You need to create a
+`.env.production.local` in the `quizzer-client` folder and a `.env` in the
+`quizzer-server` folder. You should base these files on the supplied templates.
+After doing this, run `npm run build` in `quizzer-client` to create a production
+build using `create-react-app`. After this, you can run
+`docker-compose up -d --build`. The API and websocket server both run on port
+`3000` by default, the client runs in an nginx container on port `3001`.
+
 ## How it works
 
 A "quizmaster" can create a new room by supplying a room name and password.
