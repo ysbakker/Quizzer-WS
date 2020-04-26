@@ -6,6 +6,7 @@ services:
     image: mongo
     expose:
       - '27017'
+    mem_limit: 200m
   quizzer-server:
     restart: always
     build: ./quizzer-server/
@@ -14,7 +15,7 @@ services:
       - ./quizzer-server/.env
     environment:
       - MONGO_URL=mongodb://database:27017
-    mem_limit: 100m
+    mem_limit: 200m
     ports:
       - '3000:3000'
     depends_on:
@@ -23,7 +24,7 @@ services:
     restart: always
     build: ./quizzer-client/
     image: ysbakker/quizzer-client
-    mem_limit: 200m
+    mem_limit: 100m
     depends_on:
       - 'quizzer-server'
     ports:
