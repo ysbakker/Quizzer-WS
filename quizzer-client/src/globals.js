@@ -1,12 +1,12 @@
-export const API_URL = 'http://yorricks-macbook-pro-4.local:3000/quizzer'
-export const SOCKET_URL = 'ws://yorricks-macbook-pro-4.local:3000'
+export const API_URL = process.env.REACT_APP_API_URL;
+export const SOCKET_URL = process.env.REACT_APP_SOCKET_URL;
 
 export const FETCH_OPTIONS = {
   cache: 'no-cache',
   credentials: 'include',
   mode: 'cors',
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
-}
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
+};

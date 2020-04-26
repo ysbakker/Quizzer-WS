@@ -5,17 +5,17 @@
   "dependencies": {
     "connected-react-router": "^6.5.2",
     "node-fetch": "^2.6.0",
-    "node-sass": "^4.12.0",
+    "node-sass": "^4.13.1",
     "react": "^16.10.2",
     "react-dom": "^16.10.2",
     "react-redux": "^7.1.1",
     "react-router-dom": "^5.1.2",
-    "react-scripts": "3.2.0",
+    "react-scripts": "^3.4.0",
     "redux": "^4.0.4",
     "redux-thunk": "^2.3.0"
   },
   "scripts": {
-    "start": "PORT=3001 BROWSER='Firefox Developer Edition' react-scripts start",
+    "start": "PORT=3001 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
