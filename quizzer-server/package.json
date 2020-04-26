@@ -4,7 +4,8 @@
   "description": "Server application for the quizzer assignment",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "npx pm2 start ./server.js --no-daemon --name \"Quizzer WS/API service\"",
+    "dev": "npx nodemon ./server.js"
   },
   "author": "Yorrick Bakker",
   "license": "MIT",
@@ -16,6 +17,7 @@
     "express-session": "^1.17.0",
     "mongoose": "^5.7.6",
     "node-fetch": "^2.6.0",
+    "pm2": "^4.4.0",
     "ws": "^7.1.2"
   }
 }
