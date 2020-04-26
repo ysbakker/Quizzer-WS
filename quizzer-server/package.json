@@ -4,7 +4,7 @@
   "description": "Server application for the quizzer assignment",
   "main": "index.js",
   "scripts": {
-    "start": "npx pm2 start ./server.js --no-daemon --name \"Quizzer WS/API service\"",
+    "start": "node ./questions/insert.js && npx pm2 start ./server.js --no-daemon --name \"Quizzer WS/API service\"",
     "dev": "npx nodemon ./server.js"
   },
   "author": "Yorrick Bakker",

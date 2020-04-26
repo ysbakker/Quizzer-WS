@@ -41,7 +41,7 @@ server.on('upgrade', (request, socket, head) => {
 
 server.on('request', app);
 server.listen(3000, () => {
-  console.log('The Server is lisening on port 3000.');
+  console.log('The Server is listening on port 3000.');
 });
 
 /*******************
@@ -49,17 +49,10 @@ server.listen(3000, () => {
  *******************/
 // See README.md for API routes
 
-mongoose.connect(
-  `${
-    process.env.NODE_ENV === 'production'
-      ? process.env.MONGO_URL_PROD
-      : process.env.MONGO_URL
-  }/Quizzer`,
-  {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }
-);
+mongoose.connect(`${process.env.MONGO_URL}/Quizzer`, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+});
 
 app.use(
   cors({
