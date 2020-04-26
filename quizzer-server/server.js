@@ -49,10 +49,17 @@ server.listen(3000, () => {
  *******************/
 // See README.md for API routes
 
-mongoose.connect('mongodb://127.0.0.1/Quizzer', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+mongoose.connect(
+  `${
+    process.env.NODE_ENV === 'production'
+      ? process.env.MONGO_URL_PROD
+      : process.env.MONGO_URL
+  }/Quizzer`,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  }
+);
 
 app.use(
   cors({
