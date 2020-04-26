@@ -9,7 +9,6 @@ import * as GLOBALS from '../../globals';
  * {APIerr: statuscode, data}
  */
 const defaultFetch = (api_path, method, body) => {
-  console.log(GLOBALS.API_URL);
   return (
     fetch(`${GLOBALS.API_URL}${api_path}`, {
       ...GLOBALS.FETCH_OPTIONS,

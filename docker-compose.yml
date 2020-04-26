@@ -1,0 +1,30 @@
+version: '2.4'
+
+services:
+  database:
+    restart: always
+    image: mongo
+    expose:
+      - '27017'
+  quizzer-server:
+    restart: always
+    build: ./quizzer-server/
+    image: ysbakker/quizzer-server
+    env_file:
+      - ./quizzer-server/.env
+    environment:
+      - MONGO_URL=mongodb://database:27017
+    mem_limit: 100m
+    ports:
+      - '3000:3000'
+    depends_on:
+      - 'database'
+  quizzer-client:
+    restart: always
+    build: ./quizzer-client/
+    image: ysbakker/quizzer-client
+    mem_limit: 200m
+    depends_on:
+      - 'quizzer-server'
+    ports:
+      - '3001:80'
