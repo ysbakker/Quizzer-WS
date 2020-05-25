@@ -4,8 +4,8 @@
   "description": "Server application for the quizzer assignment",
   "main": "index.js",
   "scripts": {
-    "start": "node ./questions/insert.js && npx pm2 start ./server.js --no-daemon --name \"Quizzer WS/API service\"",
-    "dev": "npx nodemon ./server.js"
+    "start": "node ./questions/insert.js && node server",
+    "dev": "nodemon ./server.js"
   },
   "author": "Yorrick Bakker",
   "license": "MIT",
