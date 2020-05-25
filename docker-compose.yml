@@ -24,7 +24,7 @@ services:
     restart: always
     build: ./quizzer-client/
     image: ysbakker/quizzer-client
-    mem_limit: 100m
+    mem_limit: 40m
     depends_on:
       - 'quizzer-server'
     ports:
