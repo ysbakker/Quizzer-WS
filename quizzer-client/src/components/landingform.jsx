@@ -42,7 +42,7 @@ export default class LandingForm extends React.Component {
           : state.message.map(msg => <li key="msg">{msg}</li>)}
         </ul>
       </div>
-      <button className="submit" onClick={(event) => {
+      <input type="image" src="/img/submit_arrow.svg" alt="Submit" className="submit" onClick={(event) => {
         event.preventDefault()
         const el = document.querySelector(`#${fieldName}`)
         const valid = this.validate(el.value)
@@ -56,9 +56,7 @@ export default class LandingForm extends React.Component {
         this.setState({ error: false })
         props.handleSubmit(el.value)
         el.value = ''
-      }}>
-        <img src="/img/submit_arrow.svg" alt="Submit" />
-      </button>
+      }} />
     </form >
   }
 }

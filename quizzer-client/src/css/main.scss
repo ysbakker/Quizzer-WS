@@ -154,11 +154,11 @@ a.bare-link {
     font-style: italic;
   }
 
-  button.submit {
+  input.submit {
     background: none;
     border: none;
-    text-align: right;
     cursor: pointer;
+    align-self: flex-end;
   }
 
   input[type=text],
