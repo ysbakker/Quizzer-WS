@@ -50,6 +50,19 @@ body {
   max-width: 768px;
 }
 
+.team-landing {
+  display: flex;
+  flex-direction: column;
+
+  .action-buttons-wrapper {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    padding-bottom: 5vh;
+  }
+}
+
 .fetching-indicator {
   position: absolute;
   bottom: 5px;

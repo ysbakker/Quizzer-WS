@@ -13,6 +13,7 @@ import renameTeamAction from '../actions/async/renameTeamAction'
 import QuizQuestion from '../components/quizquestion';
 import submitAnswerAction from '../actions/async/submitAnswerAction';
 import QuestionResult from '../components/questionresult';
+import ActionButton from '../components/actionbutton';
 
 /***********************
  ** TeamApp Component **
@@ -119,6 +120,14 @@ class TeamApp extends React.Component {
       <Route exact path="/authenticate">
         <Landing>
           {this.landingViewComponent()}
+          <div className="action-buttons-wrapper">
+            <ActionButton buttons={[{
+              text: "Create Room",
+              clickHandler: () => {
+                props.history.push('/quizmaster')
+              }
+            }]} />
+          </div>
         </Landing>
       </Route>
       <Route exact path="/quiz">
