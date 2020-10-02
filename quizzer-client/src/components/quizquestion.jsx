@@ -4,7 +4,7 @@ import Logo from './logo'
 
 export default function QuizQuestion(props) {
   const { roomname, round, questionNr, question, submittedAnswer, submitAnswer } = props
-  return <>
+  return <div className="team-quiz">
     <Logo />
     <div className="quizzer-info">
       <p>"{roomname}"</p>
@@ -31,5 +31,5 @@ export default function QuizQuestion(props) {
         }}
       />
     </div>
-  </>
+  </div>
 }
