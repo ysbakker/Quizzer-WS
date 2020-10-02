@@ -17,10 +17,10 @@ export default function Scores(props) {
       <p className="sub">"{roomname}"</p>
       <ol className="scores">
         {scores.sort(compare).map((s, i) => {
-          if (i <= 3) return <li>
+          return i <= 3 ? <li>
             <p className="score-name">{s.name}</p>
             <p className="score-score">{s.points} points</p>
-          </li>
+          </li> : null
         })}
       </ol>
     </div>
